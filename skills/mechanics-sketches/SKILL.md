@@ -6,7 +6,9 @@ description: >
   MechanicsSketches Python library. Use this skill when asked to create
   free-body diagrams, structural sketches, or mechanical engineering figures.
 license: MIT
-metadata: {"author": "MatthiasHBusch", "version": "1.0.0", "homepage": "https://github.com/MatthiasHBusch/MechanicsSketches"}
+homepage: https://github.com/MatthiasHBusch/MechanicsSketches
+metadata: {"author": "MatthiasHBusch", "version": "1.0.0"}
+files: ["scripts/*", "references/*"]
 ---
 
 # MechanicsSketches Skill
@@ -15,11 +17,16 @@ You can generate engineering mechanics sketches programmatically using the **Mec
 
 ## Setup
 
-The library must be importable. Either install it or ensure its parent directory is on `PYTHONPATH`:
+Install the library via pip:
+
+```bash
+pip install git+https://github.com/MatthiasHBusch/MechanicsSketches.git
+```
+
+Or install dependencies manually and add to `PYTHONPATH`:
 
 ```bash
 pip install matplotlib PyQt5
-# Add to PYTHONPATH if not installed as a package
 export PYTHONPATH="/path/to/parent/of/MechanicsSketches:$PYTHONPATH"
 ```
 
@@ -128,3 +135,18 @@ Supported formats: `.pdf`, `.png`, `.jpg`, `.svg`
 4. For detailed API signatures, see `references/api_reference.md`
 5. The `render()` function requires a filename — it does not display interactively
 6. Do **not** use `mpl_render()` — it is deprecated due to text scaling issues. Always use `render()`.
+
+## External Endpoints
+
+This skill makes **no network requests**. All processing is done locally.
+
+## Security & Privacy
+
+- **No data leaves your machine.** The skill only reads local JSON files and writes local image/PDF output.
+- No API keys or credentials are required.
+- No telemetry or analytics.
+- The helper script (`scripts/generate_sketch.py`) only reads the input file specified by the user and writes to the specified output path.
+
+## Trust Statement
+
+This skill is developed and maintained by [MatthiasHBusch](https://github.com/MatthiasHBusch). The source code is fully open under the MIT license. All functionality runs locally with no external dependencies beyond standard Python packages (matplotlib, PyQt5).
