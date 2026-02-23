@@ -114,8 +114,8 @@ All return new objects (non-destructive). Can be chained.
 ### Rendering
 
 ```python
-render(sketch, filename="output.pdf", dpi=300)  # Qt renderer (default)
-mpl_render(sketch, filename="output.pdf")        # Matplotlib fallback
+render(sketch, filename="output.pdf", dpi=300)  # Qt renderer (default, recommended)
+mpl_render(sketch, filename="output.pdf")        # Matplotlib fallback (deprecated, text scaling issues)
 ```
 
 Supported formats: `.pdf`, `.png`, `.jpg`, `.svg`
@@ -127,3 +127,4 @@ Supported formats: `.pdf`, `.png`, `.jpg`, `.svg`
 3. Use LaTeX for annotations: `r"$F$"`, `r"$M_0$"`, `r"$\ell$"`
 4. For detailed API signatures, see `references/api_reference.md`
 5. The `render()` function requires a filename — it does not display interactively
+6. Do **not** use `mpl_render()` — it is deprecated due to text scaling issues. Always use `render()`.
