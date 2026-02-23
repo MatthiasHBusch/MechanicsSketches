@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MechanicsSketches"
+version = "1.0.0"
+description = "A Python library for creating and rendering technical sketches for engineering mechanics"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Matthias Busch", email = "matthias.busch@tuhh.de"},
+]
+keywords = ["mechanics", "engineering", "sketches", "free-body-diagram", "structural", "beam", "truss"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = [
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+editor = ["PyQt5"]
+all = ["PyQt5"]
+
+[project.urls]
+Homepage = "https://github.com/MatthiasHBusch/MechanicsSketches"
+Repository = "https://github.com/MatthiasHBusch/MechanicsSketches"
+Documentation = "https://github.com/MatthiasHBusch/MechanicsSketches/blob/main/docs.md"
+Issues = "https://github.com/MatthiasHBusch/MechanicsSketches/issues"
+
+[tool.setuptools.packages.find]
+where = [".."]
+include = ["MechanicsSketches*"]
+exclude = ["MechanicsSketches.tests*", "MechanicsSketches.skills*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

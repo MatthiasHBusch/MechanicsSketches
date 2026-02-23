@@ -1,0 +1,15 @@
+# PDF files
+*.pdf
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor
+.vscode/
+
+# Build / packaging
+dist/
+build/
+*.egg-info/
