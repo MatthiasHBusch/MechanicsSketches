@@ -8,8 +8,8 @@ A Python library for creating and rendering technical sketches for engineering m
 
 - **Programmatic API** — Build sketches from primitives (lines, circles, polygons, arcs, text) and pre-built mechanical components
 - **Qt-based renderer** — High-quality PDF, PNG, and SVG output with automatic headless mode
-- **Matplotlib fallback** — Alternative rendering via matplotlib with LaTeX support
-- **Graphical editor** — Interactive PyQt5 editor with drawing tools, component library, and property editing
+- **Matplotlib fallback** — Alternative rendering via matplotlib with LaTeX support *(deprecated — text scaling issues)*
+- **Graphical editor** — Interactive PyQt5 editor with drawing tools, component library, and property editing *(beta)*
 - **Transformations** — Translate, rotate, and scale any primitive or group (non-destructive)
 - **JSON serialization** — Save and load sketches as JSON files
 - **OpenClaw AgentSkill** — Let AI agents generate sketches autonomously via the bundled [OpenClaw](https://openclaw.ai) skill
