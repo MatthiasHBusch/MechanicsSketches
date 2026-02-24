@@ -555,9 +555,16 @@ class GArc(SketchItemMixin, QGraphicsPathItem):
         x, y = self.data_obj["x"], self.data_obj["y"]
         w, h = self.data_obj["width"], self.data_obj["height"]
         theta1, theta2 = self.data_obj["theta1"], self.data_obj["theta2"]
+        angle = self.data_obj.get("angle", 0.0)
         rect = QRectF(x - w/2, y - h/2, w, h)
-        path.arcMoveTo(rect, theta1)
-        path.arcTo(rect, theta1, theta2 - theta1)
+        # Negate angles to compensate for the view's Y-flip (scale(1, -1)).
+        # In scene coords, angle θ appears visually as -θ after the flip,
+        # and CCW becomes CW. Negating both start angle and sweep restores
+        # the correct visual direction matching matplotlib's convention.
+        scene_theta1 = -(theta1 + angle)
+        scene_sweep = -(theta2 - theta1)
+        path.arcMoveTo(rect, scene_theta1)
+        path.arcTo(rect, scene_theta1, scene_sweep)
         self.setPath(path)
 
     def update_style(self):
@@ -601,7 +608,7 @@ def render_mpl_svg(text, fontsize, color="black", use_latex=True):
         fig.text(0, 0, text, color=color, fontsize=fontsize)
         
         buf = BytesIO()
-        fig.savefig(buf, format='svg', transparent=True, bbox_inches='tight', pad_inches=0.02)
+        fig.savefig(buf, format='svg', transparent=True, bbox_inches='tight', pad_inches=0.05)
         plt.close(fig)
         
         # Restore setting
@@ -610,15 +617,16 @@ def render_mpl_svg(text, fontsize, color="black", use_latex=True):
         buf.seek(0)
         svg_data = buf.getvalue()
         
-        # Get SVG size
+        # Get SVG size using viewBoxF for float precision
+        # (defaultSize() returns integers which can truncate and clip text)
         renderer = QSvgRenderer(QByteArray(svg_data))
         if not renderer.isValid():
             return None
         
-        svg_size = renderer.defaultSize()
+        svg_box = renderer.viewBoxF()
         
         # Return SVG bytes, width, height
-        return svg_data, svg_size.width(), svg_size.height()
+        return svg_data, svg_box.width(), svg_box.height()
     except Exception as e:
         print(f"matplotlib SVG render error: {e}")
         return None
@@ -659,15 +667,15 @@ def render_typst(text, fontsize, color="black"):
         os.unlink(typ_path)
         os.unlink(svg_path)
         
-        # Get SVG size
+        # Get SVG size using viewBoxF for float precision
         renderer = QSvgRenderer(QByteArray(svg_data))
         if not renderer.isValid():
             return None
         
-        svg_size = renderer.defaultSize()
+        svg_box = renderer.viewBoxF()
         
         # Return SVG bytes, width, height
-        return svg_data, svg_size.width(), svg_size.height()
+        return svg_data, svg_box.width(), svg_box.height()
     except FileNotFoundError:
         print("Typst not found - install with: cargo install typst-cli")
         return None
