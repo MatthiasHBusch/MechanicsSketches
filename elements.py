@@ -454,17 +454,25 @@ def add_coordinate_system(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.
 def make_dimension_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
     """Creates a double-headed dimension arrow.
 
-    At angle_deg=0, the dimension is horizontal. The arrow is placed
-    slightly above the center point (offset by dy_c).
+    Positioned by its center (cx, cy). At angle_deg=0, the dimension is
+    horizontal with the arrow line and annotation above the center point.
+    To place a dimension below a beam, use angle_deg=180 (flips text and
+    arrow to sit below). Helper lines extend in the opposite direction
+    of the text (i.e., downward when text is above, upward when text is below).
+
+    Also available as add_dimension_arrow_pp() which takes two endpoints
+    instead of center + length + angle.
 
     Args:
-        cx, cy: Center of the dimension line.
+        cx, cy: Center of the dimension span.
         length: Total span in coordinate units (divided by scale_factor internally).
-        angle_deg: Rotation in degrees. 0 = horizontal, 90 = vertical.
+        angle_deg: Rotation in degrees. 0 = horizontal, text above.
+                   180 = horizontal, text below. 90 = vertical, text to the left.
         scale_factor: Uniform scale.
-        annotation: Label text (LaTeX supported).
-        helper_line_1_length, helper_line_2_length: Length of optional
-            perpendicular helper lines at each end.
+        annotation: Label text (LaTeX supported), placed above the arrow line.
+        helper_line_1_length: Length of perpendicular helper line at the left/start end.
+            Extends opposite to the text direction (downward when text is above).
+        helper_line_2_length: Length of perpendicular helper line at the right/end end.
     """
     length = length/scale_factor
     arrow_head_length = 0.5
@@ -514,15 +522,21 @@ def add_dimension_arrow(sketch, cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale
 def make_dimension_thickness(cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Creates a thickness dimension with inward-pointing arrows.
 
-    At angle_deg=0, the dimension is horizontal. Arrows point inward
-    toward the center, indicating a measured thickness.
+    Positioned by its center (cx, cy). At angle_deg=0, the dimension is
+    horizontal with arrows pointing inward to indicate the measured distance.
+    The annotation is placed to the right of the arrows. Use angle_deg=180
+    to place the annotation to the left, or angle_deg=90 for a vertical
+    thickness with annotation above.
+
+    Also available as add_dimension_thickness_pp() which takes two endpoints
+    instead of center + thickness + angle.
 
     Args:
         cx, cy: Center of the thickness.
         thickness: Distance being measured in coordinate units (divided by scale_factor internally).
         angle_deg: Rotation in degrees. 0 = horizontal, 90 = vertical.
         scale_factor: Uniform scale.
-        annotation: Label text (LaTeX supported).
+        annotation: Label text (LaTeX supported), placed to the right of the arrows.
     """
     thickness = thickness/scale_factor
     arrow_length = 2 * 1.5 + thickness
