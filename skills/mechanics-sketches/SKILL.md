@@ -87,6 +87,8 @@ All positions and sizes should be multiples of `S` (typically 30.0). This keeps 
 | `add_moment(sketch, cx, cy, angle_deg, scale_factor, annotation, ...)` | Curved moment arrow | Center, angle, scale, label |
 | `add_dimension_arrow(sketch, cx, cy, length, angle_deg, scale_factor, annotation, ...)` | Double-headed dimension | Center, length, angle, scale, label |
 | `add_dimension_thickness(sketch, cx, cy, thickness, angle_deg, scale_factor, annotation, ...)` | Inward dimension arrows | Center, thickness, angle, scale, label |
+| `add_dimension_arrow_pp(sketch, ax, ay, bx, by, scale_factor, annotation, ...)` | Dimension arrow A→B (point-to-point) | Endpoints, scale, label |
+| `add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor, annotation, ...)` | Thickness dimension A→B (point-to-point) | Endpoints, scale, label |
 | `add_coordinate_system(sketch, cx, cy, angle_deg, scale_factor, ax1, ax2, ax3, ...)` | x-y-z axes | Center, angle, scale, axis labels |
 | `add_text(sketch, x, y, text, fontsize, name, rotation)` | Text annotation | Position, text, font size |
 

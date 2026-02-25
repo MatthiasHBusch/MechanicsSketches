@@ -248,6 +248,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_dimension_arrow(sketch, ..., name="")` | Add dimension to sketch | |
 | `make_dimension_thickness(cx, cy, thickness, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Thickness dimension (inward arrows) | Horizontal |
 | `add_dimension_thickness(sketch, ..., name="")` | Add thickness dimension to sketch | |
+| `add_dimension_arrow_pp(sketch, ax, ay, bx, by, ...)` | Dimension arrow between two points (computes center, length, angle) | A→B direction |
+| `add_dimension_thickness_pp(sketch, ax, ay, bx, by, ...)` | Thickness dimension between two points (computes center, distance, angle) | A→B direction |
 
 #### Text
 
@@ -497,6 +499,14 @@ add_dimension_arrow(sketch, cx=2.5*S, cy=-S, length=5*S, angle_deg=0,
 # Thickness dimension (arrows pointing inward)
 add_dimension_thickness(sketch, cx=0, cy=0, thickness=2*S, angle_deg=90,
                         scale_factor=S, annotation=r"$t$", fontsize_scale=1.0)
+
+# Point-to-point dimension arrow (convenience: specify endpoints instead of center)
+add_dimension_arrow_pp(sketch, ax=0, ay=-S, bx=5*S, by=-S,
+                       scale_factor=S*0.6, annotation=r"$a$")
+
+# Point-to-point thickness dimension
+add_dimension_thickness_pp(sketch, ax=-S, ay=0, bx=S, by=0,
+                           scale_factor=S, annotation=r"$d$")
 
 # Coordinate system
 # angle_deg=0: ax1 points right (+x), ax2 points up (+y)

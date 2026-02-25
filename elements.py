@@ -456,6 +456,44 @@ def add_dimension_thickness(sketch, cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0
     add_to_sketch(sketch, group)
     return group
 
+def add_dimension_arrow_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
+    """Add a dimension arrow between two points A and B.
+    
+    Convenience wrapper around make_dimension_arrow that computes center,
+    length, and angle from the two endpoints.
+    """
+    cx = (ax + bx) / 2
+    cy = (ay + by) / 2
+    length = math.sqrt((bx - ax) ** 2 + (by - ay) ** 2)
+    angle_deg = math.degrees(math.atan2(by - ay, bx - ax))
+    objects = make_dimension_arrow(cx=cx, cy=cy, length=length, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, helper_line_1_length=helper_line_1_length, helper_line_2_length=helper_line_2_length)
+    if name == "":
+        name = f"Bemaßungspfeil PP ({ax}, {ay}) -> ({bx}, {by})"
+    group = make_group(objects, name)
+    group["c_type"] = "dimension_arrow"
+    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "helper_line_1_length": helper_line_1_length, "helper_line_2_length": helper_line_2_length}
+    add_to_sketch(sketch, group)
+    return group
+
+def add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    """Add a thickness dimension between two points A and B.
+    
+    Convenience wrapper around make_dimension_thickness that computes center,
+    thickness (distance), and angle from the two endpoints.
+    """
+    cx = (ax + bx) / 2
+    cy = (ay + by) / 2
+    thickness = math.sqrt((bx - ax) ** 2 + (by - ay) ** 2)
+    angle_deg = math.degrees(math.atan2(by - ay, bx - ax))
+    objects = make_dimension_thickness(cx=cx, cy=cy, thickness=thickness, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+    if name == "":
+        name = f"Bemaßungsdicke PP ({ax}, {ay}) -> ({bx}, {by})"
+    group = make_group(objects, name)
+    group["c_type"] = "dimension_thickness"
+    group["c_params"] = {"cx": cx, "cy": cy, "thickness": thickness, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    add_to_sketch(sketch, group)
+    return group
+
 def add_text(sketch, x, y, text, fontsize=10, name="", rotation=0):
     """Adds a text to the sketch."""
     obj = make_text(x, y, text, fontsize, rotation=rotation)
