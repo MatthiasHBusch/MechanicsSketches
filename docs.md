@@ -209,9 +209,9 @@ Pre-built mechanical components for engineering diagrams.
 
 | Function | German Name | Description | Orientation (angle_deg=0) |
 |----------|-------------|-------------|---------------------------|
-| `make_pinned_support(cx, cy, angle_deg, scale_factor)` | Festlager | Pinned support with triangle and hatching | Points upward (+y) |
+| `make_pinned_support(cx, cy, angle_deg, scale_factor)` | Festlager | Pinned support with triangle and hatching | Below beam, supporting upward |
 | `add_pinned_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
-| `make_roller_support(cx, cy, angle_deg, scale_factor)` | Loslager | Roller support with sliding gap | Points upward (+y) |
+| `make_roller_support(cx, cy, angle_deg, scale_factor)` | Loslager | Roller support with sliding gap | Below beam, supporting upward |
 | `add_roller_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
 | `make_fixed_support(cx, cy, angle_deg, scale_factor)` | Einspannung | Fixed/clamped support with wall hatching | Vertical wall, hatching left |
 | `add_fixed_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
@@ -233,7 +233,7 @@ Pre-built mechanical components for engineering diagrams.
 |----------|-------------|---------------------------|
 | `make_arrow(cx, cy, length, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Generic arrow | Points rightward (+x) |
 | `add_arrow(sketch, ..., name="")` | Add arrow to sketch | |
-| `make_force(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Force arrow pointing toward the application point | Points downwards (-y) as standard |
+| `make_force(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Force arrow pointing toward the application point | Points downward (toward beam) |
 | `add_force(sketch, ..., name="")` | Add force to sketch | |
 | `make_moment(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Curved moment arrow | Counterclockwise |
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
@@ -446,10 +446,10 @@ result = translate(rotate(scale(obj, 0, 0, 0.5), 0, 0, 30), 10, 5)
 #### Supports
 
 ```python
-# Pinned support at (0, 0), pointing upward (angle_deg=0 default)
+# Pinned support at (0, 0), supporting from below (angle_deg=0 default)
 add_pinned_support(sketch, cx=0, cy=0, angle_deg=0, scale_factor=S)
 
-# Roller support at (10*S, 0), pointing upward
+# Roller support at (10*S, 0), supporting from below
 add_roller_support(sketch, cx=10*S, cy=0, angle_deg=0, scale_factor=S)
 
 # Fixed support (wall) at (0, 0)
@@ -475,10 +475,10 @@ add_truss(sketch, ax=0, ay=0, bx=5, by=3, scale_factor=1.0)
 
 ```python
 # Force at (5*S, 0)
-# angle_deg=0: pointing upward (+y)
-# angle_deg=180: pointing downward (-y)
-# angle_deg=90: pointing leftward (-x)
-# angle_deg=-90: pointing rightward (+x)
+# angle_deg=0: pointing downward (toward beam, designed for horizontal beams)
+# angle_deg=180: pointing upward
+# angle_deg=90: pointing leftward
+# angle_deg=-90: pointing rightward
 add_force(sketch, cx=5*S, cy=0, angle_deg=0, scale_factor=S, 
           annotation=r"$F$", fontsize_scale=1.0, offsetx=0, offsety=0)
 

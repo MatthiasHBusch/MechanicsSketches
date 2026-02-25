@@ -70,8 +70,15 @@ All positions and sizes should be multiples of `S` (typically 30.0). This keeps 
 
 ### Angle Convention
 
-- `angle_deg=0` → default orientation (upward for supports/forces, horizontal for dimensions)
-- Angles rotate counterclockwise in degrees
+All components are designed so that `angle_deg=0` works for a **horizontal beam**:
+
+- **Forces**: point **downward** toward the beam (angle_deg=0)
+- **Supports** (pinned, roller): sit **below** the beam (angle_deg=0)
+- **Fixed support**: **vertical wall** with hatching to the left (angle_deg=0)
+- **Dimensions**: **horizontal** (angle_deg=0)
+- **Arrows**: point **rightward** (angle_deg=0)
+- **Moments**: **counterclockwise** (angle_deg=0)
+- Positive angles rotate **counterclockwise**
 
 ### Available Components
 

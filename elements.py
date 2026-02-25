@@ -8,8 +8,15 @@ from .base import (
 # --- Festlager ----------------------------------------------------------------
 
 def make_pinned_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
-    """
-    Creates a pinned support (Festlager).
+    """Creates a pinned support (Festlager).
+
+    At angle_deg=0, the support sits below the beam (triangle pointing up,
+    hatching below). Designed for a horizontal beam.
+
+    Args:
+        cx, cy: Application point (top of the support triangle).
+        angle_deg: Rotation in degrees. 0 = supporting from below.
+        scale_factor: Uniform scale.
     """
     # 0. Geometry constants
     triangle_height = 1.5
@@ -61,8 +68,16 @@ def add_pinned_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, 
 # --- Loslager ----------------------------------------------------------------
 
 def make_roller_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
-    """
-    Creates a roller support (Loslager).
+    """Creates a roller support (Loslager).
+
+    At angle_deg=0, the support sits below the beam (triangle pointing up,
+    hatching below, sliding gap between triangle and baseline).
+    Designed for a horizontal beam.
+
+    Args:
+        cx, cy: Application point (top of the support triangle).
+        angle_deg: Rotation in degrees. 0 = supporting from below.
+        scale_factor: Uniform scale.
     """
     # 0. Geometry constants
     triangle_height = 1.5
@@ -116,7 +131,16 @@ def add_roller_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, 
 # --- Einspannung ----------------------------------------------------------------
 
 def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
-    """Creates a fixed support (Einspannung)."""
+    """Creates a fixed support / clamped wall (Einspannung).
+
+    At angle_deg=0, this is a vertical wall with hatching to the left.
+    Designed as the left end of a horizontal beam.
+
+    Args:
+        cx, cy: Point where the wall meets the beam.
+        angle_deg: Rotation in degrees. 0 = vertical wall, hatching left.
+        scale_factor: Uniform scale.
+    """
     # 0. Geometry constants
     baseline_width = 2.5
     # hatching
@@ -154,7 +178,14 @@ def add_fixed_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, n
 # --- Gelenk ----------------------------------------------------------------
 
 def make_hinge(cx=0.0, cy=0.0, scale_factor=1.0):
-    """Creates a hinge (Gelenk)."""
+    """Creates a hinge joint (Gelenk).
+
+    A small circle at the given point, indicating an internal hinge.
+
+    Args:
+        cx, cy: Center of the hinge.
+        scale_factor: Uniform scale.
+    """
     # 0. Geometry constants
     circle_radius = 0.4
     base_lw = 0.05
@@ -180,7 +211,13 @@ def add_hinge(sketch, cx=0.0, cy=0.0, scale_factor=1.0, name=""):
 # --- Beam & Truss -------------------------------------------------------------
 
 def make_beam(ax, ay, bx, by, scale_factor=1.0):
-    """Creates a beam."""
+    """Creates a beam (Balken) as a filled rectangle between two points.
+
+    Args:
+        ax, ay: Start point.
+        bx, by: End point.
+        scale_factor: Controls the beam thickness (not length).
+    """
     start_x = ax
     start_y = ay
     length = ((bx - ax) ** 2 + (by - ay) ** 2) ** 0.5
@@ -206,7 +243,13 @@ def add_beam(sketch, ax, ay, bx, by, scale_factor=1.0, name=""):
     return group
 
 def make_truss(ax, ay, bx, by, scale_factor=1.0):
-    """Creates a truss (Dehnstab)."""
+    """Creates a truss member (Dehnstab) as a thick line between two points.
+
+    Args:
+        ax, ay: Start point.
+        bx, by: End point.
+        scale_factor: Controls the line thickness.
+    """
     primitives = [make_line(ax, ay, bx, by, 1.0 * scale_factor, 5)]
     return primitives
 
@@ -223,7 +266,17 @@ def add_truss(sketch, ax, ay, bx, by, scale_factor=1.0, name=""):
 # --- Forces & Moments ---------------------------------------------------------
 
 def make_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1.0, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    """Creates an arrow."""
+    """Creates a generic arrow.
+
+    At angle_deg=0, the arrow points to the right (+x).
+
+    Args:
+        cx, cy: Tail of the arrow.
+        length: Arrow length in coordinate units (divided by scale_factor internally).
+        angle_deg: Direction in degrees. 0 = right, 90 = up.
+        scale_factor: Uniform scale.
+        annotation: Label text (LaTeX supported).
+    """
     arrow_head_length = 0.5
     arrow_head_width = 0.35
     length = length/scale_factor
@@ -258,7 +311,18 @@ def add_arrow(sketch, cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.
     return group
 
 def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    """Creates a force arrow."""
+    """Creates a force arrow pointing toward the application point.
+
+    At angle_deg=0, the force points downward (arrow tip near the beam,
+    shaft extending upward). Designed for a horizontal beam.
+
+    Args:
+        cx, cy: Application point (where the force acts).
+        angle_deg: Rotation in degrees. 0 = downward, 90 = leftward,
+                   180 = upward, -90/270 = rightward.
+        scale_factor: Uniform scale.
+        annotation: Label text (LaTeX supported).
+    """
     arrow_length = 3.0
     arrow_head_length = 0.7
     arrow_head_width = 0.5
@@ -293,7 +357,16 @@ def add_force(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", 
     return group
 
 def make_moment(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    """Creates a moment."""
+    """Creates a moment (curved arrow).
+
+    At angle_deg=0, the moment is counterclockwise.
+
+    Args:
+        cx, cy: Center of the moment.
+        angle_deg: Rotation in degrees.
+        scale_factor: Uniform scale.
+        annotation: Label text (LaTeX supported).
+    """
     arrow_head_length = 0.7
     arrow_head_width = 0.5
     radius = 2.0
@@ -333,7 +406,17 @@ def add_moment(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="",
 # --- Dimensions & Coordinate System -------------------------------------------
 
 def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1="$x$", ax2="$y$", ax3="$z$", last_axis_out_of_image=True, fontsize_scale=1, rotate_annotation=0, offset_ax1_x=0.0, offset_ax1_y=0.0, offset_ax2_x=0.0, offset_ax2_y=0.0, offset_ax3_x=0.0, offset_ax3_y=0.0):
-    """Creates a coordinate system."""
+    """Creates a coordinate system with two in-plane axes and an optional third axis.
+
+    At angle_deg=0, ax1 points right (+x) and ax2 points up (+y).
+
+    Args:
+        cx, cy: Origin of the coordinate system.
+        angle_deg: Rotation of the entire system.
+        ax1, ax2, ax3: Axis labels (LaTeX supported). Set ax3="" to hide.
+        last_axis_out_of_image: True = dot (out of plane), False = cross (into plane).
+        scale_factor: Uniform scale.
+    """
     arrow_length = 3.0
     # linewidth
     base_lw = 0.05
@@ -369,7 +452,20 @@ def add_coordinate_system(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.
     return group
 
 def make_dimension_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
-    """Creates a dimension arrow."""
+    """Creates a double-headed dimension arrow.
+
+    At angle_deg=0, the dimension is horizontal. The arrow is placed
+    slightly above the center point (offset by dy_c).
+
+    Args:
+        cx, cy: Center of the dimension line.
+        length: Total span in coordinate units (divided by scale_factor internally).
+        angle_deg: Rotation in degrees. 0 = horizontal, 90 = vertical.
+        scale_factor: Uniform scale.
+        annotation: Label text (LaTeX supported).
+        helper_line_1_length, helper_line_2_length: Length of optional
+            perpendicular helper lines at each end.
+    """
     length = length/scale_factor
     arrow_head_length = 0.5
     arrow_length = length - 2 * arrow_head_length*1.12
@@ -416,7 +512,18 @@ def add_dimension_arrow(sketch, cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale
     return group
 
 def make_dimension_thickness(cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    """Creates a thickness dimension."""
+    """Creates a thickness dimension with inward-pointing arrows.
+
+    At angle_deg=0, the dimension is horizontal. Arrows point inward
+    toward the center, indicating a measured thickness.
+
+    Args:
+        cx, cy: Center of the thickness.
+        thickness: Distance being measured in coordinate units (divided by scale_factor internally).
+        angle_deg: Rotation in degrees. 0 = horizontal, 90 = vertical.
+        scale_factor: Uniform scale.
+        annotation: Label text (LaTeX supported).
+    """
     thickness = thickness/scale_factor
     arrow_length = 2 * 1.5 + thickness
     arrow_head_length = 0.5
