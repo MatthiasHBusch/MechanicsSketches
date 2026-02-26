@@ -318,8 +318,8 @@ def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", f
 
     Args:
         cx, cy: Application point (where the force acts).
-        angle_deg: Rotation in degrees. 0 = downward, 90 = leftward,
-                   180 = upward, -90/270 = rightward.
+        angle_deg: Rotation in degrees. 0 = downward, 90 = rightward,
+                   180 = upward, -90/270 = leftward.
         scale_factor: Uniform scale.
         annotation: Label text (LaTeX supported).
     """
@@ -352,6 +352,72 @@ def add_force(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", 
         name = f"Kraft ({cx}, {cy}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "force"
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    add_to_sketch(sketch, group)
+    return group
+
+def make_force_pull(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    """Creates a pulling force arrow anchored at the structural contact point.
+
+    Unlike make_force (where cx/cy is near the arrowhead), here cx/cy is
+    the point on the structure where the force is applied (the far end of
+    the arrow shaft).  The arrowhead points AWAY from the structure in the
+    direction given by angle_deg.
+
+    Use this for tension / pulling forces where it is natural to specify
+    the attachment point on the beam rather than the arrow tip.
+
+    At angle_deg=0, the force pulls downward (same convention as make_force).
+
+    Args:
+        cx, cy: Point on the structure where the force is applied.
+        angle_deg: Direction of the pull. 0 = downward, 90 = rightward,
+                   180 = upward, -90/270 = leftward.
+        scale_factor: Uniform scale.
+        annotation: Label text (LaTeX supported).
+    """
+    # Geometry constants (must match make_force)
+    dy_c = 0.5
+    arrow_length = 3.0
+    total_h = dy_c + arrow_length  # 3.5
+
+    theta = math.radians(angle_deg)
+    sin_t = math.sin(theta)
+    cos_t = math.cos(theta)
+
+    # Shift internal origin so the far end of the shaft lands at (cx, cy).
+    # In make_force local coords the far end is at (0, total_h) before scaling.
+    # After scale + rotate + translate to (cx_int, cy_int):
+    #   far_end = (cx_int - total_h*sf*sin(θ),  cy_int + total_h*sf*cos(θ))
+    # We want far_end == (cx, cy):
+    shift_x =  total_h * scale_factor * sin_t
+    shift_y = -total_h * scale_factor * cos_t
+    cx_int = cx + shift_x
+    cy_int = cy + shift_y
+
+    # Generate force arrow without annotation (we reposition it ourselves)
+    primitives = make_force(cx_int, cy_int, angle_deg, scale_factor)
+
+    if annotation != "":
+        # Place annotation near the arrowhead (tip), which is far from the
+        # structure.  In local coords the tip sits at y = dy_c, the label
+        # should sit a bit beyond that (negative y in pull frame).
+        label_h = total_h + 0.5          # slightly past the arrowhead
+        text = make_text(0, -label_h, annotation, fontsize_scale, 10)
+        text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
+        text = rotate(text, 0, 0, angle_deg)
+        text = translate(text, cx + offsetx, cy + offsety)
+        text = rotate(text, text["x"], text["y"], rotate_annotation - angle_deg)
+        primitives.append(text)
+
+    return primitives
+
+def add_force_pull(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_force_pull(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+    if name == "":
+        name = f"Zugkraft ({cx}, {cy}, {angle_deg}°, {scale_factor})"
+    group = make_group(objects, name)
+    group["c_type"] = "force_pull"
     group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
     add_to_sketch(sketch, group)
     return group

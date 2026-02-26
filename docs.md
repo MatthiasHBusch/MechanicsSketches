@@ -92,7 +92,7 @@ add_beam(sketch, ax=0, ay=0, bx=10*S, by=0, scale_factor=S)
 add_pinned_support(sketch, cx=0, cy=0, angle_deg=0, scale_factor=S)
 add_roller_support(sketch, cx=10*S, cy=0, angle_deg=0, scale_factor=S)
 
-# Add a force (angle_deg=0 means pointing upward, 180 means downward)
+# Add a force (angle_deg=0 means pointing downward, 180 means upward)
 add_force(sketch, cx=5*S, cy=0, angle_deg=0, scale_factor=S, annotation=r"$F$")
 
 # Render and save (Qt renderer is default)
@@ -235,6 +235,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_arrow(sketch, ..., name="")` | Add arrow to sketch | |
 | `make_force(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Force arrow pointing toward the application point | Points downward (toward beam) |
 | `add_force(sketch, ..., name="")` | Add force to sketch | |
+| `make_force_pull(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Pulling force anchored at structure contact point | Arrowhead points away (e.g. downward) |
+| `add_force_pull(sketch, ..., name="")` | Add pulling force to sketch | |
 | `make_moment(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Curved moment arrow | Counterclockwise |
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
 
@@ -477,10 +479,17 @@ add_truss(sketch, ax=0, ay=0, bx=5, by=3, scale_factor=1.0)
 # Force at (5*S, 0)
 # angle_deg=0: pointing downward (toward beam, designed for horizontal beams)
 # angle_deg=180: pointing upward
-# angle_deg=90: pointing leftward
-# angle_deg=-90: pointing rightward
+# angle_deg=90: pointing rightward
+# angle_deg=-90: pointing leftward
 add_force(sketch, cx=5*S, cy=0, angle_deg=0, scale_factor=S, 
           annotation=r"$F$", fontsize_scale=1.0, offsetx=0, offsety=0)
+
+# Pulling force (tension) anchored at the beam
+# (cx, cy) is where the force attaches to the structure
+# Arrowhead points AWAY from structure in the pull direction
+# angle_deg=0: pulls downward, 90: pulls rightward, 180: pulls upward
+add_force_pull(sketch, cx=10*S, cy=0, angle_deg=90, scale_factor=S,
+               annotation=r"$F$")
 
 # Moment at (3*S, 0) with label
 # angle_deg=0: counterclockwise
@@ -538,7 +547,7 @@ add_beam(sketch, ax=0, ay=0, bx=12*S, by=0, scale_factor=S)
 add_pinned_support(sketch, cx=0, cy=0, angle_deg=0, scale_factor=S)
 add_roller_support(sketch, cx=12*S, cy=0, angle_deg=0, scale_factor=S)
 
-# Point load at midspan (angle_deg=0 = upward, so this is a downward force with 180)
+# Point load at midspan (angle_deg=0 = downward push force)
 add_force(sketch, cx=6*S, cy=0, angle_deg=0, scale_factor=S, annotation=r"$P$")
 
 # Dimensions
@@ -568,7 +577,7 @@ add_fixed_support(sketch, cx=0, cy=0, angle_deg=0, scale_factor=S)
 # Beam
 add_beam(sketch, ax=0, ay=0, bx=8*S, by=0, scale_factor=S)
 
-# Multiple forces to simulate distributed load (pointing down with angle_deg=0 means up, so use specific offset)
+# Multiple forces to simulate distributed load (angle_deg=0 = downward)
 for i in range(1, 8):
     add_force(sketch, cx=i*S, cy=0, angle_deg=0, scale_factor=S*0.5)
 
@@ -609,7 +618,7 @@ add_hinge(sketch, 4*S, 3*S, scale_factor=S)
 add_pinned_support(sketch, cx=0, cy=0, angle_deg=0, scale_factor=S)
 add_roller_support(sketch, cx=8*S, cy=0, angle_deg=0, scale_factor=S)
 
-# Load at top (angle_deg=0 = up, use 0 for upward force)
+# Load at top (angle_deg=0 = downward force)
 add_force(sketch, cx=4*S, cy=3*S, angle_deg=0, scale_factor=S, annotation=r"$F$")
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -674,6 +683,7 @@ COMPONENT_FACTORIES = {
     "beam": make_beam,
     "truss": make_truss,
     "force": make_force,
+    "force_pull": make_force_pull,
     "moment": make_moment,
     "coordinate_system": make_coordinate_system,
     "dimension_arrow": make_dimension_arrow,
