@@ -13,3 +13,8 @@ __pycache__/
 dist/
 build/
 *.egg-info/
+
+# Generated example/test outputs (but keep best_* reference images)
+examples/*.png
+examples/*.svg
+!examples/best_*.png

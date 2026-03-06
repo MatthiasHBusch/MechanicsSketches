@@ -450,7 +450,7 @@ def make_moment(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", 
     primitives = translate(primitives, cx, cy)
     
     if annotation != "":
-        text = make_text(3, 0, annotation, fontsize_scale, 10)
+        text = make_text(0.5, radius + 0.5, annotation, fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -499,7 +499,9 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
         else:
             primitives.append(make_circle(0, 0, 0.08, linewidth=base_lw, layer=6, facecolor="black"))
     
-    primitives.append(make_text(0.5 + offset_ax3_x, 0.5 + offset_ax3_y, ax3, fontsize_scale, 10, rotation=rotate_annotation))
+    # Adapt ax3 label distance from origin to fontsize — prevents overlap at larger scales
+    ax3_base = 0.5 * max(1.0, fontsize_scale)
+    primitives.append(make_text(ax3_base + offset_ax3_x, ax3_base + offset_ax3_y, ax3, fontsize_scale, 10, rotation=rotate_annotation))
         
     primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
     primitives = rotate(primitives, 0, 0, angle_deg, ignore_text=True)
@@ -681,9 +683,26 @@ def add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name=""
     add_to_sketch(sketch, group)
     return group
 
-def add_text(sketch, x, y, text, fontsize=10, name="", rotation=0):
-    """Adds a text to the sketch."""
-    obj = make_text(x, y, text, fontsize, rotation=rotation)
+def add_text(sketch, x, y, text, fontsize=10, name="", rotation=0, scale_factor=None):
+    """Adds a text to the sketch.
+
+    Args:
+        x, y: Position of the text.
+        text: Text string (LaTeX supported, e.g. r"$F$").
+        fontsize: Text size. Interpretation depends on scale_factor:
+            - Without scale_factor: raw scene units (75 = large, 30 = medium, 10 = small).
+            - With scale_factor: behaves like fontsize_scale in force/moment/dimension,
+              i.e. fontsize=1.0 with scale_factor=30 gives the same size as force labels.
+        scale_factor: Optional. When provided, the text is scaled like other components
+            (fontsize is multiplied by scale_factor). Recommended for consistent sizing.
+        rotation: Rotation angle in degrees.
+    """
+    if scale_factor is not None:
+        obj = make_text(0, 0, text, fontsize, rotation=rotation)
+        obj = scale(obj, 0, 0, scale_factor)
+        obj = translate(obj, x, y)
+    else:
+        obj = make_text(x, y, text, fontsize, rotation=rotation)
     if name == "":
         name = f"Text ({x}, {y}, '{text}')"
     # Text is usually just a primitive, but to keep consistent with group structure if desired
