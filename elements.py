@@ -608,17 +608,16 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
                  [x_pos + arrow_head_width / 2, shaft_bottom]],
                 base_lw, 8))
         else:
-            # Negative: origin at connecting line, tip points toward beam
-            # Arrow hangs down from the connecting line position
+            # Negative: arrow flipped, tip points AWAY from beam (upward)
+            # Shaft from beam surface to arrowhead base, head at connecting line
             line_y = dy_c + arrow_len   # connecting line is always positive
-            shaft_top = line_y - arrow_head_length
-            tip_y = dy_c               # tip at beam surface
+            head_base_y = line_y - arrow_head_length
 
-            primitives.append(make_line(x_pos, line_y, x_pos, shaft_top, base_lw, 8))
+            primitives.append(make_line(x_pos, dy_c, x_pos, head_base_y, base_lw, 8))
             primitives.append(make_polygon(
-                [[x_pos, tip_y],
-                 [x_pos - arrow_head_width / 2, tip_y + arrow_head_length],
-                 [x_pos + arrow_head_width / 2, tip_y + arrow_head_length]],
+                [[x_pos, line_y],
+                 [x_pos - arrow_head_width / 2, head_base_y],
+                 [x_pos + arrow_head_width / 2, head_base_y]],
                 base_lw, 8))
 
     # --- Connecting line (polyline, always on positive side) ------------------
