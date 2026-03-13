@@ -575,12 +575,11 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
         distribution = _default_distribution
 
     span = length / scale_factor
-    arrow_head_length = 0.7
-    arrow_head_width = 0.5
+    arrow_head_length = 0.7 * 0.7    # 30% smaller than force arrowheads
+    arrow_head_width = 0.5 * 0.7     # 30% smaller than force arrowheads
     dy_c = 0.5
     base_arrow_length = 3.0
     base_lw = 0.05
-    min_arrow_threshold = 0.05  # skip arrows shorter than this fraction
 
     n_arrows = max(2, round(span))
     primitives = []
@@ -590,15 +589,14 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
         t = i / (n_arrows - 1) if n_arrows > 1 else 0.5
         x_pos = -span / 2 + t * span
         f_val = distribution(t)
-
-        if abs(f_val) < min_arrow_threshold:
-            continue
-
         arrow_len = 2 * abs(f_val) * base_arrow_length
+
+        # Skip arrows too short to fit an arrowhead
+        if arrow_len < arrow_head_length * 1.05:
+            continue
 
         if f_val >= 0:
             # Positive: tip near beam (pointing toward structure), shaft up
-            # Same layout as make_force
             tip_y = dy_c
             shaft_bottom = dy_c + arrow_head_length
             shaft_top = dy_c + arrow_len
@@ -610,20 +608,20 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
                  [x_pos + arrow_head_width / 2, shaft_bottom]],
                 base_lw, 8))
         else:
-            # Negative: origin at beam surface, tip points away
-            # Arrow starts at dy_c (beam surface) and extends downward
-            origin_y = dy_c
-            shaft_top = origin_y - arrow_head_length
-            shaft_bottom = origin_y - arrow_len
+            # Negative: origin at connecting line, tip points toward beam
+            # Arrow hangs down from the connecting line position
+            line_y = dy_c + arrow_len   # connecting line is always positive
+            shaft_top = line_y - arrow_head_length
+            tip_y = dy_c               # tip at beam surface
 
-            primitives.append(make_line(x_pos, shaft_top, x_pos, shaft_bottom, base_lw, 8))
+            primitives.append(make_line(x_pos, line_y, x_pos, shaft_top, base_lw, 8))
             primitives.append(make_polygon(
-                [[x_pos, shaft_bottom],
-                 [x_pos - arrow_head_width / 2, shaft_bottom + arrow_head_length],
-                 [x_pos + arrow_head_width / 2, shaft_bottom + arrow_head_length]],
+                [[x_pos, tip_y],
+                 [x_pos - arrow_head_width / 2, tip_y + arrow_head_length],
+                 [x_pos + arrow_head_width / 2, tip_y + arrow_head_length]],
                 base_lw, 8))
 
-    # --- Connecting line (polyline following distribution) --------------------
+    # --- Connecting line (polyline, always on positive side) ------------------
     n_line_pts = max(n_arrows, 30)
     line_points_x = []
     line_points_y = []
@@ -632,11 +630,8 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
         x_pos = -span / 2 + t * span
         f_val = distribution(t)
         arrow_len = 2 * abs(f_val) * base_arrow_length
-
-        if f_val >= 0:
-            y_pos = dy_c + arrow_len
-        else:
-            y_pos = dy_c - arrow_len
+        # Line always on the positive (far-from-beam) side
+        y_pos = dy_c + arrow_len
 
         line_points_x.append(x_pos)
         line_points_y.append(y_pos)
