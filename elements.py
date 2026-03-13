@@ -578,7 +578,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     arrow_head_length = 0.7 * 0.7    # 30% smaller than force arrowheads
     arrow_head_width = 0.5 * 0.7     # 30% smaller than force arrowheads
     dy_c = 0.5
-    base_arrow_length = 3.0
+    base_arrow_length = 2.1          # 30% shorter than force arrows
     base_lw = 0.05
 
     n_arrows = max(2, round(span))
