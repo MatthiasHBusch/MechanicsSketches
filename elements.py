@@ -621,7 +621,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
                 base_lw, 8))
 
     # --- Connecting line (polyline, always on positive side) ------------------
-    n_line_pts = max(n_arrows, 30)
+    n_line_pts = max(n_arrows, 120)
     line_points_x = []
     line_points_y = []
     for j in range(n_line_pts):
