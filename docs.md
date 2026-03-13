@@ -241,6 +241,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
 | `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
 | `add_moment_arrow(sketch, ..., name="")` | Add moment arrow to sketch | |
+| `make_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ...)` | Distributed load (multiple arrows + connecting line) | Downward, uniform |
+| `add_distributed_load(sketch, ..., name="")` | Add distributed load to sketch | |
 
 #### Dimensions & Coordinate Systems
 
@@ -503,6 +505,20 @@ add_moment(sketch, cx=3*S, cy=0, angle_deg=0, scale_factor=S,
 # Useful for moment vectors in 3D free body diagrams
 add_moment_arrow(sketch, cx=7*S, cy=0, angle_deg=0, scale_factor=S,
                  annotation=r"$M_x$", fontsize_scale=1.0)
+
+# Distributed load (uniform, default distribution=lambda t: 0.5)
+add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
+                     scale_factor=S, annotation=r"$q_0$")
+
+# Triangular distributed load (linear, growing left to right)
+add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
+                     scale_factor=S, distribution=lambda t: t,
+                     annotation=r"$q(x)$")
+
+# Sign-changing load (positive on left, negative on right)
+# Negative values flip arrows to point away from structure
+add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
+                     scale_factor=S, distribution=lambda t: 0.5 - t)
 ```
 
 #### Dimensions
@@ -694,6 +710,7 @@ COMPONENT_FACTORIES = {
     "force_pull": make_force_pull,
     "moment": make_moment,
     "moment_arrow": make_moment_arrow,
+    "distributed_load": make_distributed_load,
     "coordinate_system": make_coordinate_system,
     "dimension_arrow": make_dimension_arrow,
     "dimension_thickness": make_dimension_thickness,

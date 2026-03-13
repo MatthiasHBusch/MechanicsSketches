@@ -177,6 +177,7 @@ QT_QPA_PLATFORM=offscreen python -m pytest tests/test_visual_benchmarks.py -v
 | Force | `add_force()` | Arrow with optional annotation |
 | Moment | `add_moment()` | Curved arrow with optional annotation |
 | Moment arrow | `add_moment_arrow()` | Straight arrow with double arrowhead (>>) |
+| Distributed load | `add_distributed_load()` | Multiple arrows with connecting line, supports variable distributions |
 | Dimension | `add_dimension_arrow()` | Double-headed measuring arrow |
 | Thickness | `add_dimension_thickness()` | Inward-pointing dimension |
 | Coord. system | `add_coordinate_system()` | x-y-z axis indicator |

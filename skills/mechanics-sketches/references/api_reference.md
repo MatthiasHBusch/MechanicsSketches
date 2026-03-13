@@ -117,6 +117,14 @@ add_moment_arrow(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
                  rotate_annotation=False, name="")
 # Straight moment arrow with double arrowhead (>>). angle_deg=0 → downward (same as force).
 # Two stacked arrowheads at the tip distinguish it from a single-headed force arrow.
+
+add_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
+                     distribution=lambda t: 0.5, annotation="",
+                     fontsize_scale=1.0, offsetx=0, offsety=0,
+                     rotate_annotation=False, name="")
+# Distributed load (multiple arrows + connecting line). n_arrows auto-computed.
+# distribution: f(t) -> float, t ∈ [0,1]. Negative f(t) flips arrows.
+# Examples: lambda t: 0.5 (uniform), lambda t: t (triangular).
 ```
 
 ### Dimensions

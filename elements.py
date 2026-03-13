@@ -538,6 +538,151 @@ def add_moment_arrow(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, na
     add_to_sketch(sketch, group)
     return group
 
+def _default_distribution(t):
+    return 0.5
+
+def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
+                           distribution=None, annotation="", fontsize_scale=1,
+                           offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    """Creates a distributed load (multiple arrows with connecting line).
+
+    A set of evenly spaced force arrows along a span, connected by a line
+    at their far ends.  The distribution function controls individual arrow
+    lengths and can produce uniform, triangular, or arbitrary load profiles.
+
+    At angle_deg=0, arrows point downward toward (cx, cy), same as make_force.
+
+    Args:
+        cx, cy: Center of the load span (application line on the structure).
+        length: Total span in coordinate units (divided by scale_factor
+                internally, so length is in the same space as beam endpoints).
+        angle_deg: Rotation in degrees. 0 = downward, 90 = rightward.
+        scale_factor: Uniform scale.
+        distribution: Callable f(t) -> float, where t ∈ [0, 1] is the
+                      position along the span (0 = left/start, 1 = right/end).
+                      Arrow length at t = 2 × |f(t)| × base_arrow_length.
+                      Positive f(t): arrow points toward the structure
+                      (like make_force).  Negative f(t): arrow flips,
+                      originating at the structure surface and pointing away.
+                      Default: lambda t: 0.5 (uniform load).
+        annotation: Label text (LaTeX supported), placed above the highest
+                    point of the connecting line.
+        fontsize_scale: Scale factor for the annotation font size.
+        offsetx, offsety: Extra offset for the annotation position.
+        rotate_annotation: Rotation for the annotation text in degrees.
+    """
+    if distribution is None:
+        distribution = _default_distribution
+
+    span = length / scale_factor
+    arrow_head_length = 0.7
+    arrow_head_width = 0.5
+    dy_c = 0.5
+    base_arrow_length = 3.0
+    base_lw = 0.05
+    min_arrow_threshold = 0.05  # skip arrows shorter than this fraction
+
+    n_arrows = max(2, round(span))
+    primitives = []
+
+    # --- Arrows ---------------------------------------------------------------
+    for i in range(n_arrows):
+        t = i / (n_arrows - 1) if n_arrows > 1 else 0.5
+        x_pos = -span / 2 + t * span
+        f_val = distribution(t)
+
+        if abs(f_val) < min_arrow_threshold:
+            continue
+
+        arrow_len = 2 * abs(f_val) * base_arrow_length
+
+        if f_val >= 0:
+            # Positive: tip near beam (pointing toward structure), shaft up
+            # Same layout as make_force
+            tip_y = dy_c
+            shaft_bottom = dy_c + arrow_head_length
+            shaft_top = dy_c + arrow_len
+
+            primitives.append(make_line(x_pos, shaft_bottom, x_pos, shaft_top, base_lw, 8))
+            primitives.append(make_polygon(
+                [[x_pos, tip_y],
+                 [x_pos - arrow_head_width / 2, shaft_bottom],
+                 [x_pos + arrow_head_width / 2, shaft_bottom]],
+                base_lw, 8))
+        else:
+            # Negative: origin at beam surface, tip points away
+            # Arrow starts at dy_c (beam surface) and extends downward
+            origin_y = dy_c
+            shaft_top = origin_y - arrow_head_length
+            shaft_bottom = origin_y - arrow_len
+
+            primitives.append(make_line(x_pos, shaft_top, x_pos, shaft_bottom, base_lw, 8))
+            primitives.append(make_polygon(
+                [[x_pos, shaft_bottom],
+                 [x_pos - arrow_head_width / 2, shaft_bottom + arrow_head_length],
+                 [x_pos + arrow_head_width / 2, shaft_bottom + arrow_head_length]],
+                base_lw, 8))
+
+    # --- Connecting line (polyline following distribution) --------------------
+    n_line_pts = max(n_arrows, 30)
+    line_points_x = []
+    line_points_y = []
+    for j in range(n_line_pts):
+        t = j / (n_line_pts - 1) if n_line_pts > 1 else 0.5
+        x_pos = -span / 2 + t * span
+        f_val = distribution(t)
+        arrow_len = 2 * abs(f_val) * base_arrow_length
+
+        if f_val >= 0:
+            y_pos = dy_c + arrow_len
+        else:
+            y_pos = dy_c - arrow_len
+
+        line_points_x.append(x_pos)
+        line_points_y.append(y_pos)
+
+    for j in range(len(line_points_x) - 1):
+        primitives.append(make_line(
+            line_points_x[j], line_points_y[j],
+            line_points_x[j + 1], line_points_y[j + 1],
+            base_lw, 8))
+
+    # --- Transforms -----------------------------------------------------------
+    primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
+    primitives = rotate(primitives, 0, 0, angle_deg)
+    primitives = translate(primitives, cx, cy)
+
+    # --- Annotation -----------------------------------------------------------
+    if annotation != "":
+        # Place label above the highest point of the connecting line
+        max_y = max(line_points_y)
+        text = make_text(0, max_y + dy_c, annotation, fontsize_scale, 10)
+        text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
+        text = rotate(text, 0, 0, angle_deg)
+        text = translate(text, cx + offsetx, cy + offsety)
+        text = rotate(text, text["x"], text["y"], rotate_annotation - angle_deg)
+        primitives.append(text)
+
+    return primitives
+
+def add_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
+                          distribution=None, annotation="", fontsize_scale=1,
+                          offsetx=0.0, offsety=0.0, rotate_annotation=0, name=""):
+    objects = make_distributed_load(cx=cx, cy=cy, length=length, angle_deg=angle_deg,
+                                    scale_factor=scale_factor, distribution=distribution,
+                                    annotation=annotation, fontsize_scale=fontsize_scale,
+                                    offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+    if name == "":
+        name = f"Streckenlast ({cx}, {cy}, {length}, {angle_deg}°)"
+    group = make_group(objects, name)
+    group["c_type"] = "distributed_load"
+    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg,
+                         "scale_factor": scale_factor, "annotation": annotation,
+                         "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety,
+                         "rotate_annotation": rotate_annotation}
+    add_to_sketch(sketch, group)
+    return group
+
 # --- Dimensions & Coordinate System -------------------------------------------
 
 def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1="$x$", ax2="$y$", ax3="$z$", last_axis_out_of_image=True, fontsize_scale=1, rotate_annotation=0, offset_ax1_x=0.0, offset_ax1_y=0.0, offset_ax2_x=0.0, offset_ax2_y=0.0, offset_ax3_x=0.0, offset_ax3_y=0.0):
