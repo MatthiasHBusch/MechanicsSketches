@@ -111,6 +111,12 @@ add_moment(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
            annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
            rotate_annotation=False, name="")
 # Curved moment arrow. angle_deg=0 → counterclockwise.
+
+add_moment_arrow(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
+                 annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
+                 rotate_annotation=False, name="")
+# Straight moment arrow with double arrowhead (>>). angle_deg=0 → downward (same as force).
+# Two stacked arrowheads at the tip distinguish it from a single-headed force arrow.
 ```
 
 ### Dimensions

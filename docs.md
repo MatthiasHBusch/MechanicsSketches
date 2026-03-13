@@ -239,6 +239,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_force_pull(sketch, ..., name="")` | Add pulling force to sketch | |
 | `make_moment(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Curved moment arrow | Counterclockwise |
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
+| `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
+| `add_moment_arrow(sketch, ..., name="")` | Add moment arrow to sketch | |
 
 #### Dimensions & Coordinate Systems
 
@@ -495,6 +497,12 @@ add_force_pull(sketch, cx=10*S, cy=0, angle_deg=90, scale_factor=S,
 # angle_deg=0: counterclockwise
 add_moment(sketch, cx=3*S, cy=0, angle_deg=0, scale_factor=S,
            annotation=r"$M$", fontsize_scale=1.0)
+
+# Moment arrow (double-headed straight arrow) at (7*S, 0)
+# angle_deg=0: pointing rightward (+x)
+# Useful for moment vectors in 3D free body diagrams
+add_moment_arrow(sketch, cx=7*S, cy=0, angle_deg=0, scale_factor=S,
+                 annotation=r"$M_x$", fontsize_scale=1.0)
 ```
 
 #### Dimensions
@@ -685,6 +693,7 @@ COMPONENT_FACTORIES = {
     "force": make_force,
     "force_pull": make_force_pull,
     "moment": make_moment,
+    "moment_arrow": make_moment_arrow,
     "coordinate_system": make_coordinate_system,
     "dimension_arrow": make_dimension_arrow,
     "dimension_thickness": make_dimension_thickness,

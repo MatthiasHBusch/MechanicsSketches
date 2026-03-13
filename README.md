@@ -176,6 +176,7 @@ QT_QPA_PLATFORM=offscreen python -m pytest tests/test_visual_benchmarks.py -v
 | Truss | `add_truss()` | Line member between two points |
 | Force | `add_force()` | Arrow with optional annotation |
 | Moment | `add_moment()` | Curved arrow with optional annotation |
+| Moment arrow | `add_moment_arrow()` | Straight arrow with double arrowhead (>>) |
 | Dimension | `add_dimension_arrow()` | Double-headed measuring arrow |
 | Thickness | `add_dimension_thickness()` | Inward-pointing dimension |
 | Coord. system | `add_coordinate_system()` | x-y-z axis indicator |

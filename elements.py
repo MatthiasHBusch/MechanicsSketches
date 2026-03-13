@@ -469,6 +469,75 @@ def add_moment(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="",
     add_to_sketch(sketch, group)
     return group
 
+def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    """Creates a moment arrow (straight arrow with double arrowhead).
+
+    A straight arrow with two arrowheads stacked at the tip (>>),
+    representing a moment as a vector.  The double arrowhead at the tip
+    distinguishes it visually from a single-headed force arrow.
+
+    At angle_deg=0, the arrow points downward toward the application
+    point (same convention as make_force).  The shaft extends upward
+    with the double arrowhead near (cx, cy).
+
+    The layout and label positioning follow the same conventions as
+    make_force: the arrow is offset by dy_c from the application point,
+    and the annotation is placed at the far end of the shaft.
+
+    Args:
+        cx, cy: Application point (where the moment acts).
+        angle_deg: Rotation in degrees. 0 = downward, 90 = rightward,
+                   180 = upward, -90/270 = leftward.
+        scale_factor: Uniform scale.
+        annotation: Label text (LaTeX supported).
+        fontsize_scale: Scale factor for the annotation font size.
+        offsetx, offsety: Extra offset for the annotation position.
+        rotate_annotation: Rotation for the annotation text in degrees.
+    """
+    arrow_length = 3.0
+    arrow_head_length = 0.7
+    arrow_head_width = 0.5
+    dy_c = 0.5
+    base_lw = 0.05
+    primitives = []
+
+    # Shaft line (from behind second arrowhead to far end)
+    primitives.append(make_line(0, dy_c + 2 * arrow_head_length, 0, dy_c + arrow_length, base_lw, 8))
+
+    # First arrowhead (tip, closest to application point)
+    primitives.append(make_polygon(
+        [[0, dy_c], [-arrow_head_width/2, dy_c + arrow_head_length], [arrow_head_width/2, dy_c + arrow_head_length]],
+        base_lw, 8))
+
+    # Second arrowhead (stacked behind the first)
+    primitives.append(make_polygon(
+        [[0, dy_c + arrow_head_length], [-arrow_head_width/2, dy_c + 2 * arrow_head_length], [arrow_head_width/2, dy_c + 2 * arrow_head_length]],
+        base_lw, 8))
+
+    primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
+    primitives = rotate(primitives, 0, 0, angle_deg)
+    primitives = translate(primitives, cx, cy)
+
+    if annotation != "":
+        text = make_text(0, 2 * dy_c + arrow_length, annotation, fontsize_scale, 10)
+        text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
+        text = rotate(text, 0, 0, angle_deg)
+        text = translate(text, cx + offsetx, cy + offsety)
+        text = rotate(text, text["x"], text["y"], rotate_annotation - angle_deg)
+        primitives.append(text)
+
+    return primitives
+
+def add_moment_arrow(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_moment_arrow(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+    if name == "":
+        name = f"Momentenpfeil ({cx}, {cy}, {angle_deg}°, {scale_factor})"
+    group = make_group(objects, name)
+    group["c_type"] = "moment_arrow"
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    add_to_sketch(sketch, group)
+    return group
+
 # --- Dimensions & Coordinate System -------------------------------------------
 
 def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1="$x$", ax2="$y$", ax3="$z$", last_axis_out_of_image=True, fontsize_scale=1, rotate_annotation=0, offset_ax1_x=0.0, offset_ax1_y=0.0, offset_ax2_x=0.0, offset_ax2_y=0.0, offset_ax3_x=0.0, offset_ax3_y=0.0):
