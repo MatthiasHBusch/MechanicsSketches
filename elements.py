@@ -402,7 +402,7 @@ def make_force_pull(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation=
         # Place annotation near the arrowhead (tip), which is far from the
         # structure.  In local coords the tip sits at y = dy_c, the label
         # should sit a bit beyond that (negative y in pull frame).
-        label_h = total_h + 0.5          # slightly past the arrowhead
+        label_h = total_h + 0.25          # slightly past the arrowhead
         text = make_text(0, -label_h, annotation, fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
