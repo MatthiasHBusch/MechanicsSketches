@@ -36,8 +36,8 @@ def test_moment_arrow_grid(renderer='mpl'):
     sketch = create_sketch("Moment Arrow Rotation Debug")
 
     angles = [0, 45, 90, 135, 180, 270]
-    spacing_x = 18
-    spacing_y = 14
+    spacing_x = 540
+    spacing_y = 420
 
     for i, angle in enumerate(angles):
         col = i % 3
@@ -47,19 +47,19 @@ def test_moment_arrow_grid(renderer='mpl'):
         cy = -row * spacing_y
 
         # Moment arrow (new element)
-        add_moment_arrow(sketch, cx=cx, cy=cy, angle_deg=angle, scale_factor=1.0,
-                         annotation=f"$M_{{{angle}}}$", fontsize_scale=1.0)
+        add_moment_arrow(sketch, cx=cx, cy=cy, angle_deg=angle, scale_factor=30,
+                         annotation=f"$M_{{{angle}}}$", fontsize_scale=1)
 
         # Reference force at same angle (offset to the right)
-        add_force(sketch, cx=cx + 5, cy=cy, angle_deg=angle, scale_factor=1.0,
-                  annotation=f"$F_{{{angle}}}$", fontsize_scale=1.0)
+        add_force(sketch, cx=cx + 150, cy=cy, angle_deg=angle, scale_factor=30,
+                  annotation=f"$F_{{{angle}}}$", fontsize_scale=1)
 
         # Reference curved moment (offset further right)
-        add_moment(sketch, cx=cx + 10, cy=cy, angle_deg=angle, scale_factor=1.0,
-                   annotation=f"$M_c$", fontsize_scale=1.0)
+        add_moment(sketch, cx=cx + 300, cy=cy, angle_deg=angle, scale_factor=30,
+                   annotation=f"$M_c$", fontsize_scale=1)
 
         # Label
-        label = make_text(cx + 5, cy + 6, f"angle = {angle}", fontsize=0.8, layer=10)
+        label = make_text(cx + 150, cy + 180, f"angle = {angle}", fontsize=20, layer=10)
         add_to_sketch(sketch, label)
 
     filename = os.path.join(OUTPUT_DIR, f"debug_moment_arrow_{renderer}.pdf")
@@ -81,22 +81,22 @@ def test_moment_arrow_on_beam(renderer='mpl'):
     """
     sketch = create_sketch("Moment Arrow on Beam")
 
-    S = 1.0
-    add_beam(sketch, 0, 0, 30, 0, scale_factor=S)
+    S = 30
+    add_beam(sketch, 0, 0, 900, 0, scale_factor=S)
     add_pinned_support(sketch, 0, 0, scale_factor=S)
-    add_roller_support(sketch, 30, 0, scale_factor=S)
+    add_roller_support(sketch, 900, 0, scale_factor=S)
 
     # Moment arrows at various positions
-    add_moment_arrow(sketch, cx=7, cy=0, angle_deg=90, scale_factor=S,
-                     annotation="$M_1$", fontsize_scale=1.0)
-    add_moment_arrow(sketch, cx=15, cy=0, angle_deg=0, scale_factor=S,
-                     annotation="$M_x$", fontsize_scale=1.0)
-    add_moment_arrow(sketch, cx=22, cy=0, angle_deg=-90, scale_factor=S,
-                     annotation="$M_2$", fontsize_scale=1.0)
+    add_moment_arrow(sketch, cx=210, cy=0, angle_deg=90, scale_factor=S,
+                     annotation="$M_1$", fontsize_scale=1)
+    add_moment_arrow(sketch, cx=450, cy=0, angle_deg=0, scale_factor=S,
+                     annotation="$M_x$", fontsize_scale=1)
+    add_moment_arrow(sketch, cx=660, cy=0, angle_deg=-90, scale_factor=S,
+                     annotation="$M_2$", fontsize_scale=1)
 
     # Reference: curved moment for comparison
-    add_moment(sketch, cx=10, cy=3, angle_deg=0, scale_factor=S * 0.7,
-               annotation="$M_c$", fontsize_scale=0.8)
+    add_moment(sketch, cx=300, cy=90, angle_deg=0, scale_factor=S * 0.7,
+               annotation="$M_c$", fontsize_scale=1)
 
     filename = os.path.join(OUTPUT_DIR, f"debug_moment_arrow_beam_{renderer}.pdf")
 

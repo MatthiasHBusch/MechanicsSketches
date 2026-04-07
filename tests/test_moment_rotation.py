@@ -39,8 +39,8 @@ def test_moments_grid(renderer='mpl'):
     sketch = create_sketch("Moment Rotation Debug")
 
     angles = [0, 45, 90, 135, 180, 270]
-    spacing_x = 12
-    spacing_y = 14
+    spacing_x = 360
+    spacing_y = 420
 
     for i, angle in enumerate(angles):
         col = i % 3
@@ -50,15 +50,15 @@ def test_moments_grid(renderer='mpl'):
         cy = -row * spacing_y
 
         # Add moment with rotation
-        add_moment(sketch, cx=cx, cy=cy, angle_deg=angle, scale_factor=1.0,
-                   annotation=f"$M_{{{angle}}}$", fontsize_scale=1.0)
+        add_moment(sketch, cx=cx, cy=cy, angle_deg=angle, scale_factor=30,
+                   annotation=f"$M_{{{angle}}}$", fontsize_scale=1)
 
         # Add a reference force at same location with same rotation (offset below)
-        add_force(sketch, cx=cx, cy=cy - 6, angle_deg=angle, scale_factor=1.0,
-                  annotation=f"$F_{{{angle}}}$", fontsize_scale=1.0)
+        add_force(sketch, cx=cx, cy=cy - 180, angle_deg=angle, scale_factor=30,
+                  annotation=f"$F_{{{angle}}}$", fontsize_scale=1)
 
         # Label
-        label = make_text(cx, cy + 5, f"angle = {angle}", fontsize=0.8, layer=10)
+        label = make_text(cx, cy + 150, f"angle = {angle}", fontsize=20, layer=10)
         add_to_sketch(sketch, label)
 
     filename = os.path.join(OUTPUT_DIR, f"debug_moment_rotation_{renderer}.pdf")
@@ -83,8 +83,8 @@ def test_arc_rotation_isolated(renderer='mpl'):
     sketch = create_sketch("Arc Rotation Debug")
 
     angles = [0, 30, 60, 90, 120, 180]
-    spacing = 10
-    radius = 2.0
+    spacing = 300
+    radius = 60.0
 
     for i, angle in enumerate(angles):
         col = i % 3
@@ -93,7 +93,7 @@ def test_arc_rotation_isolated(renderer='mpl'):
         cy = -row * spacing
 
         # Create an arc at the origin and rotate it
-        arc = make_arc(0, 0, 2 * radius, 2 * radius, -35, 45, 0.0, linewidth=0.05, layer=8)
+        arc = make_arc(0, 0, 2 * radius, 2 * radius, -35, 45, 0.0, linewidth=1.5, layer=8)
         arc = rotate(arc, 0, 0, angle)
         arc = translate(arc, cx, cy)
         add_to_sketch(sketch, arc)
@@ -103,25 +103,25 @@ def test_arc_rotation_isolated(renderer='mpl'):
         start_angle_rad = math.radians(-35 + angle)
         end_x = cx + radius * math.cos(start_angle_rad)
         end_y = cy + radius * math.sin(start_angle_rad)
-        ref_line = make_line(cx, cy, end_x, end_y, linewidth=0.03, layer=9, edgecolor="red")
+        ref_line = make_line(cx, cy, end_x, end_y, linewidth=0.9, layer=9, edgecolor="red")
         add_to_sketch(sketch, ref_line)
 
         # Draw another reference line for theta2
         end_angle_rad = math.radians(45 + angle)
         end_x2 = cx + radius * math.cos(end_angle_rad)
         end_y2 = cy + radius * math.sin(end_angle_rad)
-        ref_line2 = make_line(cx, cy, end_x2, end_y2, linewidth=0.03, layer=9, edgecolor="blue")
+        ref_line2 = make_line(cx, cy, end_x2, end_y2, linewidth=0.9, layer=9, edgecolor="blue")
         add_to_sketch(sketch, ref_line2)
 
         # Small center mark
-        add_to_sketch(sketch, make_circle(cx, cy, 0.15, linewidth=0.03, layer=10))
+        add_to_sketch(sketch, make_circle(cx, cy, 4.5, linewidth=0.9, layer=10))
 
         # Label
-        label = make_text(cx, cy + 3.5, f"rot = {angle}", fontsize=0.7, layer=10)
+        label = make_text(cx, cy + 105, f"rot = {angle}", fontsize=20, layer=10)
         add_to_sketch(sketch, label)
 
         # Expected theta info
-        info = make_text(cx, cy - 3.5, f"$\\theta_1$={-35+angle} $\\theta_2$={45+angle}", fontsize=0.5, layer=10)
+        info = make_text(cx, cy - 105, f"$\\theta_1$={-35+angle} $\\theta_2$={45+angle}", fontsize=15, layer=10)
         add_to_sketch(sketch, info)
 
     filename = os.path.join(OUTPUT_DIR, f"debug_arc_rotation_{renderer}.pdf")
@@ -143,23 +143,24 @@ def test_moment_with_beam(renderer='mpl'):
     """
     sketch = create_sketch("Moment on Beam Debug")
 
+    S = 30
     # Horizontal beam
-    add_beam(sketch, 0, 0, 20, 0)
-    add_pinned_support(sketch, 0, 0)
-    add_pinned_support(sketch, 20, 0)
+    add_beam(sketch, 0, 0, 600, 0, scale_factor=S)
+    add_pinned_support(sketch, 0, 0, scale_factor=S)
+    add_pinned_support(sketch, 600, 0, scale_factor=S)
 
     # Moments at various positions with different rotations
     test_cases = [
-        (5, 0, 0, "$M_0$"),
-        (10, 0, 90, "$M_{90}$"),
-        (15, 0, 180, "$M_{180}$"),
-        (5, 0, -45, "$M_{-45}$"),
-        (15, 0, 45, "$M_{45}$"),
+        (150, 0, 0, "$M_0$"),
+        (300, 0, 90, "$M_{90}$"),
+        (450, 0, 180, "$M_{180}$"),
+        (150, 0, -45, "$M_{-45}$"),
+        (450, 0, 45, "$M_{45}$"),
     ]
 
     for cx, cy, angle, label in test_cases:
-        add_moment(sketch, cx=cx, cy=cy + 3, angle_deg=angle,
-                   scale_factor=0.8, annotation=label, fontsize_scale=0.8)
+        add_moment(sketch, cx=cx, cy=cy + 90, angle_deg=angle,
+                   scale_factor=S * 0.8, annotation=label, fontsize_scale=1)
 
     filename = os.path.join(OUTPUT_DIR, f"debug_moment_on_beam_{renderer}.pdf")
 

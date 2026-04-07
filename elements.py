@@ -677,6 +677,279 @@ def add_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scal
     add_to_sketch(sketch, group)
     return group
 
+def _solve_shear_arrow_positions(span, n_arrows, distribution, gap):
+    """Solve for arrow positions with constant gap between consecutive arrows.
+
+    Uses iterative fixed-point method to find positions where:
+    - Arrow lengths are proportional to |distribution(t)| at their centers
+    - Gap between one arrow's tip and next arrow's tail is constant
+    - Arrows fill the entire span from -span/2 to +span/2
+
+    Returns:
+        List of (x_position, arrow_length, f_value) tuples
+    """
+    if n_arrows < 1:
+        return []
+    if n_arrows == 1:
+        t = 0.5
+        f_val = distribution(t)
+        # Single arrow fills span minus small margins
+        arrow_len = span * 0.8
+        return [(0.0, arrow_len, f_val)]
+
+    # Initial guess: uniform t positions
+    t_values = [(i + 0.5) / n_arrows for i in range(n_arrows)]
+
+    for iteration in range(30):
+        # Sample distribution at current positions (use small window average for stability)
+        f_values = []
+        for t in t_values:
+            # Average over small window for stability
+            samples = [distribution(max(0, min(1, t + dt)))
+                      for dt in [-0.02, -0.01, 0, 0.01, 0.02]]
+            f_values.append(sum(samples) / len(samples))
+
+        abs_f_values = [abs(f) for f in f_values]
+
+        # Total space available for arrows = span - gaps
+        total_arrow_space = span - (n_arrows - 1) * gap
+
+        # Handle case where all f values are near zero
+        sum_abs_f = sum(abs_f_values)
+        if sum_abs_f < 1e-10:
+            # Minimal arrows when distribution is zero
+            arrow_lengths = [arrow_head_length * 1.5] * n_arrows
+            k = 1.0
+        else:
+            # Scale factor to make arrows fit the available space
+            k = total_arrow_space / sum_abs_f
+            arrow_lengths = [k * abs_f for abs_f in abs_f_values]
+
+        # Ensure minimum arrow length
+        arrow_head_length = 0.7 * 0.7
+        min_len = arrow_head_length * 1.2
+        arrow_lengths = [max(min_len, a) for a in arrow_lengths]
+
+        # Recalculate k after applying minimum
+        actual_total = sum(arrow_lengths)
+        if actual_total + (n_arrows - 1) * gap > span:
+            # Need to shrink - reduce gap or arrow lengths proportionally
+            scale = (span - (n_arrows - 1) * gap * 0.5) / actual_total
+            arrow_lengths = [a * scale for a in arrow_lengths]
+
+        # Calculate positions sequentially
+        x_positions = []
+        x = -span / 2 + arrow_lengths[0] / 2
+        x_positions.append(x)
+
+        for i in range(1, n_arrows):
+            x = x_positions[i-1] + arrow_lengths[i-1] / 2 + gap + arrow_lengths[i] / 2
+            x_positions.append(x)
+
+        # Check if we overshoot the right boundary
+        last_tip = x_positions[-1] + arrow_lengths[-1] / 2
+        if last_tip > span / 2 + 0.01:
+            # Compress everything proportionally
+            overshoot = last_tip - span / 2
+            total_with_gaps = sum(arrow_lengths) + (n_arrows - 1) * gap
+            compress = (total_with_gaps - overshoot) / total_with_gaps
+            arrow_lengths = [a * compress for a in arrow_lengths]
+            # Recalculate positions
+            x_positions = []
+            x = -span / 2 + arrow_lengths[0] / 2
+            x_positions.append(x)
+            for i in range(1, n_arrows):
+                x = x_positions[i-1] + arrow_lengths[i-1] / 2 + gap * compress + arrow_lengths[i] / 2
+                x_positions.append(x)
+
+        # Update t values from positions
+        new_t_values = [(x + span / 2) / span for x in x_positions]
+        new_t_values = [max(0, min(1, t)) for t in new_t_values]
+
+        # Check convergence
+        max_diff = max(abs(new_t_values[i] - t_values[i]) for i in range(n_arrows))
+        t_values = new_t_values
+
+        if max_diff < 1e-6:
+            break
+
+    # Get final f values at converged positions
+    final_f_values = [distribution(t) for t in t_values]
+
+    return list(zip(x_positions, arrow_lengths, final_f_values))
+
+
+def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
+                                 distribution=None, annotation="", fontsize_scale=1,
+                                 offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    """Creates a shear distributed load (arrows parallel to surface).
+
+    A set of evenly spaced arrows pointing along the span, placed slightly
+    outside the beam surface.  The distribution function controls individual
+    arrow lengths and can produce uniform, triangular, or arbitrary profiles.
+    A connecting line above the arrows shows the distribution shape, with
+    vertical end lines at the span boundaries.
+
+    At angle_deg=0, the span is horizontal and arrows point left/right.
+
+    Args:
+        cx, cy: Center of the load span (application line on the structure).
+        length: Total span in coordinate units (divided by scale_factor
+                internally, so length is in the same space as beam endpoints).
+        angle_deg: Rotation in degrees. 0 = horizontal span.
+        scale_factor: Uniform scale.
+        distribution: Callable f(t) -> float, where t ∈ [0, 1] is the
+                      position along the span (0 = left/start, 1 = right/end).
+                      Arrow length at t proportional to |f(t)|.
+                      Positive f(t): arrow points in +x direction (rightward
+                      at angle_deg=0).  Negative f(t): arrow points in -x
+                      direction (leftward).
+                      Default: lambda t: 0.5 (uniform load pointing right).
+        annotation: Label text (LaTeX supported), placed above the load.
+        fontsize_scale: Scale factor for the annotation font size.
+        offsetx, offsety: Extra offset for the annotation position.
+        rotate_annotation: Rotation for the annotation text in degrees.
+    """
+    if distribution is None:
+        distribution = _default_distribution
+
+    span = length / scale_factor
+    arrow_head_length = 0.7 * 0.7    # 30% smaller than force arrowheads
+    arrow_head_width = 0.5 * 0.7     # 30% smaller than force arrowheads
+    dy_c = 0.5                       # offset from beam surface
+    dist_line_height = 2.1           # height of distribution line above dy_c
+    base_lw = 0.05
+
+    # Arrow density: arrows per unit length (in scaled coordinates)
+    arrows_per_unit = 0.7
+    n_arrows = max(2, round(span * arrows_per_unit))
+
+    # Gap between arrows (constant spacing between tip and next tail)
+    arrow_gap = 0.15
+
+    primitives = []
+
+    # --- Solve for arrow positions --------------------------------------------
+    arrow_data = _solve_shear_arrow_positions(span, n_arrows, distribution, arrow_gap)
+
+    # --- Draw arrows ----------------------------------------------------------
+    for x_pos, arrow_len, f_val in arrow_data:
+        # Skip arrows too short to fit an arrowhead
+        if arrow_len < arrow_head_length * 1.1:
+            continue
+
+        if f_val >= 0:
+            # Positive: arrow points in +x direction (rightward)
+            tail_x = x_pos - arrow_len / 2
+            tip_x = x_pos + arrow_len / 2
+
+            # Clamp to span boundaries
+            if tip_x > span / 2:
+                tip_x = span / 2
+            if tail_x < -span / 2:
+                tail_x = -span / 2
+
+            actual_len = tip_x - tail_x
+            if actual_len < arrow_head_length * 1.1:
+                continue
+
+            shaft_end_x = tip_x - arrow_head_length
+
+            primitives.append(make_line(tail_x, dy_c, shaft_end_x, dy_c, base_lw, 8))
+            primitives.append(make_polygon(
+                [[tip_x, dy_c],
+                 [tip_x - arrow_head_length, dy_c - arrow_head_width / 2],
+                 [tip_x - arrow_head_length, dy_c + arrow_head_width / 2]],
+                base_lw, 8))
+        else:
+            # Negative: arrow points in -x direction (leftward)
+            tail_x = x_pos + arrow_len / 2
+            tip_x = x_pos - arrow_len / 2
+
+            # Clamp to span boundaries
+            if tip_x < -span / 2:
+                tip_x = -span / 2
+            if tail_x > span / 2:
+                tail_x = span / 2
+
+            actual_len = tail_x - tip_x
+            if actual_len < arrow_head_length * 1.1:
+                continue
+
+            shaft_end_x = tip_x + arrow_head_length
+
+            primitives.append(make_line(tail_x, dy_c, shaft_end_x, dy_c, base_lw, 8))
+            primitives.append(make_polygon(
+                [[tip_x, dy_c],
+                 [tip_x + arrow_head_length, dy_c - arrow_head_width / 2],
+                 [tip_x + arrow_head_length, dy_c + arrow_head_width / 2]],
+                base_lw, 8))
+
+    # --- Distribution line (polyline showing the distribution shape) ----------
+    n_line_pts = max(n_arrows, 120)
+    line_points_x = []
+    line_points_y = []
+    for j in range(n_line_pts):
+        t = j / (n_line_pts - 1) if n_line_pts > 1 else 0.5
+        x_pos = -span / 2 + t * span
+        f_val = distribution(t)
+        # Line height varies with |f(t)|
+        y_pos = dy_c + dist_line_height * abs(f_val) * 2
+
+        line_points_x.append(x_pos)
+        line_points_y.append(y_pos)
+
+    for j in range(len(line_points_x) - 1):
+        primitives.append(make_line(
+            line_points_x[j], line_points_y[j],
+            line_points_x[j + 1], line_points_y[j + 1],
+            base_lw, 8))
+
+    # --- Vertical end lines ---------------------------------------------------
+    # Left vertical line: from distribution line down to arrow level
+    left_y_top = line_points_y[0]
+    primitives.append(make_line(-span / 2, dy_c, -span / 2, left_y_top, base_lw, 8))
+
+    # Right vertical line
+    right_y_top = line_points_y[-1]
+    primitives.append(make_line(span / 2, dy_c, span / 2, right_y_top, base_lw, 8))
+
+    # --- Transforms -----------------------------------------------------------
+    primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
+    primitives = rotate(primitives, 0, 0, angle_deg)
+    primitives = translate(primitives, cx, cy)
+
+    # --- Annotation -----------------------------------------------------------
+    if annotation != "":
+        # Place label above the highest point of the distribution line
+        max_y = max(line_points_y)
+        text = make_text(0, max_y + dy_c, annotation, fontsize_scale, 10)
+        text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
+        text = rotate(text, 0, 0, angle_deg)
+        text = translate(text, cx + offsetx, cy + offsety)
+        text = rotate(text, text["x"], text["y"], rotate_annotation - angle_deg)
+        primitives.append(text)
+
+    return primitives
+
+def add_shear_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
+                                distribution=None, annotation="", fontsize_scale=1,
+                                offsetx=0.0, offsety=0.0, rotate_annotation=0, name=""):
+    objects = make_shear_distributed_load(cx=cx, cy=cy, length=length, angle_deg=angle_deg,
+                                          scale_factor=scale_factor, distribution=distribution,
+                                          annotation=annotation, fontsize_scale=fontsize_scale,
+                                          offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+    if name == "":
+        name = f"Schubstreckenlast ({cx}, {cy}, {length}, {angle_deg}°)"
+    group = make_group(objects, name)
+    group["c_type"] = "shear_distributed_load"
+    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg,
+                         "scale_factor": scale_factor, "annotation": annotation,
+                         "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety,
+                         "rotate_annotation": rotate_annotation}
+    add_to_sketch(sketch, group)
+    return group
+
 # --- Dimensions & Coordinate System -------------------------------------------
 
 def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1="$x$", ax2="$y$", ax3="$z$", last_axis_out_of_image=True, fontsize_scale=1, rotate_annotation=0, offset_ax1_x=0.0, offset_ax1_y=0.0, offset_ax2_x=0.0, offset_ax2_y=0.0, offset_ax3_x=0.0, offset_ax3_y=0.0):
