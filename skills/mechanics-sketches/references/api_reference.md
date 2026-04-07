@@ -125,6 +125,15 @@ add_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
 # Distributed load (multiple arrows + connecting line). n_arrows auto-computed.
 # distribution: f(t) -> float, t ∈ [0,1]. Negative f(t) flips arrows.
 # Examples: lambda t: 0.5 (uniform), lambda t: t (triangular).
+
+add_shear_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
+                           distribution=lambda t: 0.5, annotation="",
+                           fontsize_scale=1.0, offsetx=0, offsety=0,
+                           rotate_annotation=False, name="")
+# Shear distributed load (arrows parallel to surface, tangential).
+# Arrows have constant gap between tip and next tail, lengths from distribution.
+# distribution: f(t) -> float, t ∈ [0,1]. Positive → rightward, negative → leftward.
+# Examples: lambda t: 0.5 (uniform), lambda t: t (triangular).
 ```
 
 ### Dimensions

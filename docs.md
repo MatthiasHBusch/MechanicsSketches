@@ -243,6 +243,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_moment_arrow(sketch, ..., name="")` | Add moment arrow to sketch | |
 | `make_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ...)` | Distributed load (multiple arrows + connecting line) | Downward, uniform |
 | `add_distributed_load(sketch, ..., name="")` | Add distributed load to sketch | |
+| `make_shear_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ...)` | Shear distributed load (arrows parallel to surface) | Rightward, uniform |
+| `add_shear_distributed_load(sketch, ..., name="")` | Add shear distributed load to sketch | |
 
 #### Dimensions & Coordinate Systems
 
@@ -519,6 +521,16 @@ add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
 # Negative values flip arrows to point away from structure
 add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
                      scale_factor=S, distribution=lambda t: 0.5 - t)
+
+# Shear distributed load (arrows parallel to surface, tangential)
+# Positive f(t): arrows point rightward, negative: leftward
+add_shear_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
+                           scale_factor=S, annotation=r"$\tau_0$")
+
+# Triangular shear load
+add_shear_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
+                           scale_factor=S, distribution=lambda t: t,
+                           annotation=r"$\tau(x)$")
 ```
 
 #### Dimensions
@@ -711,6 +723,7 @@ COMPONENT_FACTORIES = {
     "moment": make_moment,
     "moment_arrow": make_moment_arrow,
     "distributed_load": make_distributed_load,
+    "shear_distributed_load": make_shear_distributed_load,
     "coordinate_system": make_coordinate_system,
     "dimension_arrow": make_dimension_arrow,
     "dimension_thickness": make_dimension_thickness,
