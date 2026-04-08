@@ -103,9 +103,10 @@ add_truss(sketch, ax, ay, bx, by, scale_factor=1.0, name="")
 ```python
 add_force(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
           annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
-          rotate_annotation=False, name="")
-# Force arrow. angle_deg=0 → points upward (+y).
-# Arrow tip is at (cx, cy), arrow extends away from that point.
+          rotate_annotation=False, tip_at_surface=False, name="")
+# Force arrow. angle_deg=0 → points downward (toward beam).
+# tip_at_surface=True: arrow tip exactly at (cx, cy), no gap.
+# tip_at_surface=False (default): small gap between tip and (cx, cy).
 
 add_moment(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
            annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
@@ -121,17 +122,23 @@ add_moment_arrow(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
 add_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
                      distribution=lambda t: 0.5, annotation="",
                      fontsize_scale=1.0, offsetx=0, offsety=0,
-                     rotate_annotation=False, name="")
+                     rotate_annotation=False, show_distribution_line=True,
+                     tip_at_surface=False, name="")
 # Distributed load (multiple arrows + connecting line). n_arrows auto-computed.
 # distribution: f(t) -> float, t ∈ [0,1]. Negative f(t) flips arrows.
+# show_distribution_line=False: hides the connecting line.
+# tip_at_surface=True: arrow tips exactly at the application line.
 # Examples: lambda t: 0.5 (uniform), lambda t: t (triangular).
 
 add_shear_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
                            distribution=lambda t: 0.5, annotation="",
                            fontsize_scale=1.0, offsetx=0, offsety=0,
-                           rotate_annotation=False, name="")
+                           rotate_annotation=False, show_distribution_line=True,
+                           tip_at_surface=False, name="")
 # Shear distributed load (arrows parallel to surface, tangential).
 # Arrows have constant gap between tip and next tail, lengths from distribution.
+# show_distribution_line=False: hides distribution line and vertical end lines.
+# tip_at_surface=True: arrows exactly at the application line.
 # distribution: f(t) -> float, t ∈ [0,1]. Positive → rightward, negative → leftward.
 # Examples: lambda t: 0.5 (uniform), lambda t: t (triangular).
 ```

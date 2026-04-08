@@ -90,7 +90,7 @@ All components are designed so that `angle_deg=0` works for a **horizontal beam*
 | `add_roller_support(sketch, cx, cy, angle_deg, scale_factor)` | Sliding support | Center, angle, scale |
 | `add_fixed_support(sketch, cx, cy, angle_deg, scale_factor)` | Clamped wall support | Center, angle, scale |
 | `add_hinge(sketch, cx, cy, scale_factor)` | Joint circle | Center, scale |
-| `add_force(sketch, cx, cy, angle_deg, scale_factor, annotation, ...)` | Force arrow | Center, angle, scale, label |
+| `add_force(sketch, cx, cy, angle_deg, scale_factor, annotation, ..., tip_at_surface)` | Force arrow | Center, angle, scale, label, tip_at_surface |
 | `add_moment(sketch, cx, cy, angle_deg, scale_factor, annotation, ...)` | Curved moment arrow | Center, angle, scale, label |
 | `add_dimension_arrow(sketch, cx, cy, length, angle_deg, scale_factor, annotation, ...)` | Double-headed dimension | Center, length, angle, scale, label |
 | `add_dimension_thickness(sketch, cx, cy, thickness, angle_deg, scale_factor, annotation, ...)` | Inward dimension arrows | Center, thickness, angle, scale, label |

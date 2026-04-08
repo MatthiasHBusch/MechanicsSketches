@@ -1,14 +1,17 @@
 # Changelog
 
-## [1.1.0] - 2026-04-07
+## [1.1.0] - 2026-04-08
 
 ### Added
 - `shear_distributed_load` element for tangential/shear loads with arrows parallel to surface
 - Dynamic arrow placement algorithm with constant gap between arrows
 - Distribution line and vertical end lines for shear load visualization
+- `show_distribution_line` parameter for distributed_load and shear_distributed_load
+- `tip_at_surface` parameter for force, distributed_load, and shear_distributed_load
 
 ### Changed
 - Test scripts updated to use scale=30 and fontsize=20 for better visibility
+- Shear load annotation positioned closer when distribution line is hidden
 
 ## [1.0.0] - 2026-02-23
 

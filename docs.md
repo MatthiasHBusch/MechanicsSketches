@@ -233,7 +233,7 @@ Pre-built mechanical components for engineering diagrams.
 |----------|-------------|---------------------------|
 | `make_arrow(cx, cy, length, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Generic arrow | Points rightward (+x) |
 | `add_arrow(sketch, ..., name="")` | Add arrow to sketch | |
-| `make_force(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Force arrow pointing toward the application point | Points downward (toward beam) |
+| `make_force(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation, tip_at_surface)` | Force arrow pointing toward the application point | Points downward (toward beam) |
 | `add_force(sketch, ..., name="")` | Add force to sketch | |
 | `make_force_pull(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Pulling force anchored at structure contact point | Arrowhead points away (e.g. downward) |
 | `add_force_pull(sketch, ..., name="")` | Add pulling force to sketch | |
@@ -241,9 +241,9 @@ Pre-built mechanical components for engineering diagrams.
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
 | `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
 | `add_moment_arrow(sketch, ..., name="")` | Add moment arrow to sketch | |
-| `make_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ...)` | Distributed load (multiple arrows + connecting line) | Downward, uniform |
+| `make_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ..., show_distribution_line, tip_at_surface)` | Distributed load (multiple arrows + connecting line) | Downward, uniform |
 | `add_distributed_load(sketch, ..., name="")` | Add distributed load to sketch | |
-| `make_shear_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ...)` | Shear distributed load (arrows parallel to surface) | Rightward, uniform |
+| `make_shear_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ..., show_distribution_line, tip_at_surface)` | Shear distributed load (arrows parallel to surface) | Rightward, uniform |
 | `add_shear_distributed_load(sketch, ..., name="")` | Add shear distributed load to sketch | |
 
 #### Dimensions & Coordinate Systems
@@ -490,6 +490,10 @@ add_truss(sketch, ax=0, ay=0, bx=5, by=3, scale_factor=1.0)
 add_force(sketch, cx=5*S, cy=0, angle_deg=0, scale_factor=S, 
           annotation=r"$F$", fontsize_scale=1.0, offsetx=0, offsety=0)
 
+# Force with tip directly at (cx, cy) - no gap (for plate surfaces)
+add_force(sketch, cx=5*S, cy=0, angle_deg=0, scale_factor=S,
+          annotation=r"$F$", tip_at_surface=True)
+
 # Pulling force (tension) anchored at the beam
 # (cx, cy) is where the force attaches to the structure
 # Arrowhead points AWAY from structure in the pull direction
@@ -531,6 +535,18 @@ add_shear_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
 add_shear_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
                            scale_factor=S, distribution=lambda t: t,
                            annotation=r"$\tau(x)$")
+
+# Distributed load without connecting line
+add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
+                     scale_factor=S, show_distribution_line=False)
+
+# Distributed load with tips at surface (no gap)
+add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
+                     scale_factor=S, tip_at_surface=True)
+
+# Shear load without distribution line and vertical end lines
+add_shear_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
+                           scale_factor=S, show_distribution_line=False)
 ```
 
 #### Dimensions
