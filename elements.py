@@ -310,7 +310,7 @@ def add_arrow(sketch, cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.
     add_to_sketch(sketch, group)
     return group
 
-def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, tip_at_surface=False):
     """Creates a force arrow pointing toward the application point.
 
     At angle_deg=0, the force points downward (arrow tip near the beam,
@@ -322,11 +322,14 @@ def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", f
                    180 = upward, -90/270 = leftward.
         scale_factor: Uniform scale.
         annotation: Label text (LaTeX supported).
+        tip_at_surface: If True, the arrow tip is exactly at (cx, cy).
+                    If False (default), there is a small gap between the
+                    tip and the application point (suitable for beams).
     """
     arrow_length = 3.0
     arrow_head_length = 0.7
     arrow_head_width = 0.5
-    dy_c = 0.5
+    dy_c = 0.0 if tip_at_surface else 0.5
     base_lw = 0.05
     primitives = []
 
@@ -335,7 +338,7 @@ def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", f
     primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
     primitives = rotate(primitives, 0, 0, angle_deg)
     primitives = translate(primitives, cx, cy)
-    
+
     if annotation != "":
         text = make_text(0, 2 * dy_c + arrow_length, annotation, fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
@@ -346,13 +349,13 @@ def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", f
 
     return primitives
 
-def add_force(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    objects = make_force(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+def add_force(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, tip_at_surface=False):
+    objects = make_force(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, tip_at_surface=tip_at_surface)
     if name == "":
         name = f"Kraft ({cx}, {cy}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "force"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "tip_at_surface": tip_at_surface}
     add_to_sketch(sketch, group)
     return group
 
@@ -543,7 +546,8 @@ def _default_distribution(t):
 
 def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
                            distribution=None, annotation="", fontsize_scale=1,
-                           offsetx=0.0, offsety=0.0, rotate_annotation=0):
+                           offsetx=0.0, offsety=0.0, rotate_annotation=0,
+                           show_distribution_line=True, tip_at_surface=False):
     """Creates a distributed load (multiple arrows with connecting line).
 
     A set of evenly spaced force arrows along a span, connected by a line
@@ -570,6 +574,10 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
         fontsize_scale: Scale factor for the annotation font size.
         offsetx, offsety: Extra offset for the annotation position.
         rotate_annotation: Rotation for the annotation text in degrees.
+        show_distribution_line: If True (default), draw the connecting line
+                    showing the distribution shape.
+        tip_at_surface: If True, arrow tips are exactly at the application
+                    line. If False (default), there is a small gap.
     """
     if distribution is None:
         distribution = _default_distribution
@@ -577,7 +585,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     span = length / scale_factor
     arrow_head_length = 0.7 * 0.7    # 30% smaller than force arrowheads
     arrow_head_width = 0.5 * 0.7     # 30% smaller than force arrowheads
-    dy_c = 0.5
+    dy_c = 0.0 if tip_at_surface else 0.5
     base_arrow_length = 2.1          # 30% shorter than force arrows
     base_lw = 0.05
 
@@ -635,11 +643,12 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
         line_points_x.append(x_pos)
         line_points_y.append(y_pos)
 
-    for j in range(len(line_points_x) - 1):
-        primitives.append(make_line(
-            line_points_x[j], line_points_y[j],
-            line_points_x[j + 1], line_points_y[j + 1],
-            base_lw, 8))
+    if show_distribution_line:
+        for j in range(len(line_points_x) - 1):
+            primitives.append(make_line(
+                line_points_x[j], line_points_y[j],
+                line_points_x[j + 1], line_points_y[j + 1],
+                base_lw, 8))
 
     # --- Transforms -----------------------------------------------------------
     primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
@@ -661,11 +670,14 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
 
 def add_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
                           distribution=None, annotation="", fontsize_scale=1,
-                          offsetx=0.0, offsety=0.0, rotate_annotation=0, name=""):
+                          offsetx=0.0, offsety=0.0, rotate_annotation=0,
+                          show_distribution_line=True, tip_at_surface=False, name=""):
     objects = make_distributed_load(cx=cx, cy=cy, length=length, angle_deg=angle_deg,
                                     scale_factor=scale_factor, distribution=distribution,
                                     annotation=annotation, fontsize_scale=fontsize_scale,
-                                    offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+                                    offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation,
+                                    show_distribution_line=show_distribution_line,
+                                    tip_at_surface=tip_at_surface)
     if name == "":
         name = f"Streckenlast ({cx}, {cy}, {length}, {angle_deg}°)"
     group = make_group(objects, name)
@@ -673,7 +685,8 @@ def add_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scal
     group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg,
                          "scale_factor": scale_factor, "annotation": annotation,
                          "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety,
-                         "rotate_annotation": rotate_annotation}
+                         "rotate_annotation": rotate_annotation, "show_distribution_line": show_distribution_line,
+                         "tip_at_surface": tip_at_surface}
     add_to_sketch(sketch, group)
     return group
 
@@ -781,7 +794,8 @@ def _solve_shear_arrow_positions(span, n_arrows, distribution, gap):
 
 def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
                                  distribution=None, annotation="", fontsize_scale=1,
-                                 offsetx=0.0, offsety=0.0, rotate_annotation=0):
+                                 offsetx=0.0, offsety=0.0, rotate_annotation=0,
+                                 show_distribution_line=True, tip_at_surface=False):
     """Creates a shear distributed load (arrows parallel to surface).
 
     A set of evenly spaced arrows pointing along the span, placed slightly
@@ -809,6 +823,10 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
         fontsize_scale: Scale factor for the annotation font size.
         offsetx, offsety: Extra offset for the annotation position.
         rotate_annotation: Rotation for the annotation text in degrees.
+        show_distribution_line: If True (default), draw the distribution line
+                    and vertical end lines.
+        tip_at_surface: If True, arrows are exactly at the application
+                    line. If False (default), there is a small gap.
     """
     if distribution is None:
         distribution = _default_distribution
@@ -816,7 +834,7 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
     span = length / scale_factor
     arrow_head_length = 0.7 * 0.7    # 30% smaller than force arrowheads
     arrow_head_width = 0.5 * 0.7     # 30% smaller than force arrowheads
-    dy_c = 0.5                       # offset from beam surface
+    dy_c = 0.0 if tip_at_surface else 0.5  # offset from beam surface
     dist_line_height = 2.1           # height of distribution line above dy_c
     base_lw = 0.05
 
@@ -899,20 +917,21 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
         line_points_x.append(x_pos)
         line_points_y.append(y_pos)
 
-    for j in range(len(line_points_x) - 1):
-        primitives.append(make_line(
-            line_points_x[j], line_points_y[j],
-            line_points_x[j + 1], line_points_y[j + 1],
-            base_lw, 8))
+    if show_distribution_line:
+        for j in range(len(line_points_x) - 1):
+            primitives.append(make_line(
+                line_points_x[j], line_points_y[j],
+                line_points_x[j + 1], line_points_y[j + 1],
+                base_lw, 8))
 
-    # --- Vertical end lines ---------------------------------------------------
-    # Left vertical line: from distribution line down to arrow level
-    left_y_top = line_points_y[0]
-    primitives.append(make_line(-span / 2, dy_c, -span / 2, left_y_top, base_lw, 8))
+        # --- Vertical end lines -----------------------------------------------
+        # Left vertical line: from distribution line down to arrow level
+        left_y_top = line_points_y[0]
+        primitives.append(make_line(-span / 2, dy_c, -span / 2, left_y_top, base_lw, 8))
 
-    # Right vertical line
-    right_y_top = line_points_y[-1]
-    primitives.append(make_line(span / 2, dy_c, span / 2, right_y_top, base_lw, 8))
+        # Right vertical line
+        right_y_top = line_points_y[-1]
+        primitives.append(make_line(span / 2, dy_c, span / 2, right_y_top, base_lw, 8))
 
     # --- Transforms -----------------------------------------------------------
     primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
@@ -921,9 +940,14 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
 
     # --- Annotation -----------------------------------------------------------
     if annotation != "":
-        # Place label above the highest point of the distribution line
-        max_y = max(line_points_y)
-        text = make_text(0, max_y + dy_c, annotation, fontsize_scale, 10)
+        if show_distribution_line:
+            # Place label above the highest point of the distribution line
+            max_y = max(line_points_y)
+            text_y = max_y + dy_c
+        else:
+            # Place label closer when no distribution line is drawn
+            text_y = dy_c + 0.8
+        text = make_text(0, text_y, annotation, fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -934,11 +958,14 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
 
 def add_shear_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
                                 distribution=None, annotation="", fontsize_scale=1,
-                                offsetx=0.0, offsety=0.0, rotate_annotation=0, name=""):
+                                offsetx=0.0, offsety=0.0, rotate_annotation=0,
+                                show_distribution_line=True, tip_at_surface=False, name=""):
     objects = make_shear_distributed_load(cx=cx, cy=cy, length=length, angle_deg=angle_deg,
                                           scale_factor=scale_factor, distribution=distribution,
                                           annotation=annotation, fontsize_scale=fontsize_scale,
-                                          offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+                                          offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation,
+                                          show_distribution_line=show_distribution_line,
+                                          tip_at_surface=tip_at_surface)
     if name == "":
         name = f"Schubstreckenlast ({cx}, {cy}, {length}, {angle_deg}°)"
     group = make_group(objects, name)
@@ -946,7 +973,8 @@ def add_shear_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0
     group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg,
                          "scale_factor": scale_factor, "annotation": annotation,
                          "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety,
-                         "rotate_annotation": rotate_annotation}
+                         "rotate_annotation": rotate_annotation, "show_distribution_line": show_distribution_line,
+                         "tip_at_surface": tip_at_surface}
     add_to_sketch(sketch, group)
     return group
 
