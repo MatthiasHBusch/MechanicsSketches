@@ -329,7 +329,7 @@ def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", f
     arrow_length = 3.0
     arrow_head_length = 0.7
     arrow_head_width = 0.5
-    dy_c = 0.0 if tip_at_surface else 0.5
+    dy_c = 0.1 if tip_at_surface else 0.5
     base_lw = 0.05
     primitives = []
 
@@ -585,7 +585,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     span = length / scale_factor
     arrow_head_length = 0.7 * 0.7    # 30% smaller than force arrowheads
     arrow_head_width = 0.5 * 0.7     # 30% smaller than force arrowheads
-    dy_c = 0.0 if tip_at_surface else 0.5
+    dy_c = 0.1 if tip_at_surface else 0.5
     base_arrow_length = 2.1          # 30% shorter than force arrows
     base_lw = 0.05
 
@@ -834,7 +834,7 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
     span = length / scale_factor
     arrow_head_length = 0.7 * 0.7    # 30% smaller than force arrowheads
     arrow_head_width = 0.5 * 0.7     # 30% smaller than force arrowheads
-    dy_c = 0.0 if tip_at_surface else 0.5  # offset from beam surface
+    dy_c = 0.1 if tip_at_surface else 0.5  # offset from beam surface
     dist_line_height = 2.1           # height of distribution line above dy_c
     base_lw = 0.05
 
