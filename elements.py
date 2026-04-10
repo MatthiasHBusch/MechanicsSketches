@@ -130,7 +130,7 @@ def add_roller_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, 
 
 # --- Einspannung ----------------------------------------------------------------
 
-def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
+def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, length=1.0):
     """Creates a fixed support / clamped wall (Einspannung).
 
     At angle_deg=0, this is a vertical wall with hatching to the left.
@@ -140,9 +140,10 @@ def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
         cx, cy: Point where the wall meets the beam.
         angle_deg: Rotation in degrees. 0 = vertical wall, hatching left.
         scale_factor: Uniform scale.
+        length: Length of the support wall as a multiplier (default 1.0).
     """
     # 0. Geometry constants
-    baseline_width = 2.5
+    baseline_width = 2.5 * length
     # hatching
     hatching_distance = 0.6
     hatching_length = 0.6
@@ -165,13 +166,13 @@ def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
 
     return primitives
 
-def add_fixed_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name=""):
-    objects = make_fixed_support(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor)
+def add_fixed_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, length=1.0, name=""):
+    objects = make_fixed_support(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, length=length)
     if name == "":
         name = f"Einspannung ({cx}, {cy}, {angle_deg}°)"
     group = make_group(objects, name)
     group["c_type"] = "fixed_support"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "length": length}
     add_to_sketch(sketch, group)
     return group
 

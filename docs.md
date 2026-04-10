@@ -213,8 +213,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_pinned_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
 | `make_roller_support(cx, cy, angle_deg, scale_factor)` | Loslager | Roller support with sliding gap | Below beam, supporting upward |
 | `add_roller_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
-| `make_fixed_support(cx, cy, angle_deg, scale_factor)` | Einspannung | Fixed/clamped support with wall hatching | Vertical wall, hatching left |
-| `add_fixed_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
+| `make_fixed_support(cx, cy, angle_deg, scale_factor, length=1.0)` | Einspannung | Fixed/clamped support with wall hatching | Vertical wall, hatching left |
+| `add_fixed_support(sketch, ..., length=1.0, name="")` | | Add to sketch with group wrapper | |
 | `make_hinge(cx, cy, scale_factor)` | Gelenk | Hinge joint (simple circle) | N/A (no angle param) |
 | `add_hinge(sketch, ..., name="")` | | Add to sketch with group wrapper | |
 
@@ -463,7 +463,11 @@ add_roller_support(sketch, cx=10*S, cy=0, angle_deg=0, scale_factor=S)
 # Fixed support (wall) at (0, 0)
 # angle_deg=0: vertical wall with hatching to the left
 # angle_deg=90: horizontal wall with hatching below
+# length: multiplier for the wall length (default 1.0)
 add_fixed_support(sketch, cx=0, cy=0, angle_deg=0, scale_factor=S)
+
+# Fixed support with custom length (e.g. 1.5x longer)
+add_fixed_support(sketch, cx=0, cy=0, angle_deg=0, scale_factor=S, length=1.5)
 
 # Hinge connection at joint
 add_hinge(sketch, cx=5*S, cy=0, scale_factor=S)
