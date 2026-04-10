@@ -555,20 +555,22 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     at their far ends.  The distribution function controls individual arrow
     lengths and can produce uniform, triangular, or arbitrary load profiles.
 
-    At angle_deg=0, arrows point downward toward (cx, cy), same as make_force.
+    At angle_deg=0, positive distribution values produce arrows pointing
+    away from the structure (tension / positive by convention).  Negative
+    values produce arrows pointing toward the structure (compression).
 
     Args:
         cx, cy: Center of the load span (application line on the structure).
         length: Total span in coordinate units (divided by scale_factor
                 internally, so length is in the same space as beam endpoints).
-        angle_deg: Rotation in degrees. 0 = downward, 90 = rightward.
+        angle_deg: Rotation in degrees. 0 = upward (tension), 90 = rightward.
         scale_factor: Uniform scale.
         distribution: Callable f(t) -> float, where t ∈ [0, 1] is the
                       position along the span (0 = left/start, 1 = right/end).
                       Arrow length at t = 2 × |f(t)| × base_arrow_length.
-                      Positive f(t): arrow points toward the structure
-                      (like make_force).  Negative f(t): arrow flips,
-                      originating at the structure surface and pointing away.
+                      Positive f(t): arrow points away from the structure
+                      (tension, positive by convention).  Negative f(t):
+                      arrow points toward the structure (compression).
                       Default: lambda t: 0.5 (uniform load).
         annotation: Label text (LaTeX supported), placed above the highest
                     point of the connecting line.
@@ -597,7 +599,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     for i in range(n_arrows):
         t = i / (n_arrows - 1) if n_arrows > 1 else 0.5
         x_pos = -span / 2 + t * span
-        f_val = distribution(t)
+        f_val = -distribution(t)
         arrow_len = 2 * abs(f_val) * base_arrow_length
 
         # Skip arrows too short to fit an arrowhead
@@ -636,7 +638,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     for j in range(n_line_pts):
         t = j / (n_line_pts - 1) if n_line_pts > 1 else 0.5
         x_pos = -span / 2 + t * span
-        f_val = distribution(t)
+        f_val = -distribution(t)
         arrow_len = 2 * abs(f_val) * base_arrow_length
         # Line always on the positive (far-from-beam) side
         y_pos = dy_c + arrow_len

@@ -526,7 +526,8 @@ add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
                      annotation=r"$q(x)$")
 
 # Sign-changing load (positive on left, negative on right)
-# Negative values flip arrows to point away from structure
+# Positive values: arrows away from structure (tension)
+# Negative values: arrows toward structure (compression)
 add_distributed_load(sketch, cx=5*S, cy=0, length=10*S,
                      scale_factor=S, distribution=lambda t: 0.5 - t)
 
