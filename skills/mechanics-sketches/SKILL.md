@@ -105,7 +105,7 @@ All components are designed so that `angle_deg=0` works for a **horizontal beam*
 Force, moment, and dimension functions accept:
 - `annotation` — LaTeX string (e.g., `r"$F$"`, `r"$M_A$"`)
 - `fontsize_scale` — relative font size (default 1.0)
-- `fontsize` — absolute font size override (default None, uses fontsize_scale when None)
+- `fontsize` — absolute font size in points (default None). Final rendered size regardless of scale_factor.
 - `offsetx`, `offsety` — label position offset
 - `rotate_annotation` — rotate label with component (default False)
 

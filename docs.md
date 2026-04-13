@@ -250,7 +250,7 @@ Pre-built mechanical components for engineering diagrams.
 
 **Annotation Parameters** (common to all functions with annotations):
 - `fontsize_scale` – Relative font size multiplier (default: 1.0). Scaled with `scale_factor`.
-- `fontsize` – Absolute font size override (default: None). When set, bypasses `fontsize_scale`.
+- `fontsize` – Absolute font size in points (default: None). When set, the final rendered text will be exactly this size regardless of `scale_factor`. Overrides `fontsize_scale`.
 - `offsetx`, `offsety` – Position offset for the annotation label.
 - `rotate_annotation` – Rotation angle for the annotation text in degrees.
 

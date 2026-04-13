@@ -7,7 +7,7 @@
 - `force_normal` element for forces perpendicular to the image plane (dot/cross symbols)
 
 ### Changed
-- When `fontsize` is set (not None), it overrides `fontsize_scale` for absolute sizing
+- `fontsize` parameter is now truly absolute: specifies final rendered size in points, independent of `scale_factor`
 
 ## [1.1.0] - 2026-04-08
 

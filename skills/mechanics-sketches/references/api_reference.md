@@ -107,7 +107,7 @@ add_force(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
 # Force arrow. angle_deg=0 → points downward (toward beam).
 # tip_at_surface=True: arrow tip exactly at (cx, cy), no gap.
 # tip_at_surface=False (default): small gap between tip and (cx, cy).
-# fontsize: absolute font size (overrides fontsize_scale when set).
+# fontsize: absolute font size in points. Final rendered size regardless of scale_factor.
 
 add_moment(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
            annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
@@ -152,7 +152,7 @@ add_dimension_arrow(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
                     rotate_annotation=False, name="")
 # Double-headed dimension arrow centered at (cx, cy).
 # length is in coordinate space (not scaled). angle_deg=0 → horizontal.
-# fontsize: absolute font size (overrides fontsize_scale when set).
+# fontsize: absolute font size in points. Final rendered size regardless of scale_factor.
 
 add_dimension_thickness(sketch, cx, cy, thickness, angle_deg=0, scale_factor=1.0,
                         annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
@@ -179,7 +179,7 @@ add_coordinate_system(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
                       fontsize_scale=1.0, fontsize=None, rotate_annotation=False, name="")
 # angle_deg=0 → ax1 points right, ax2 points up.
 # last_axis_out_of_image=True → dot (⊙), False → cross (⊗).
-# fontsize: absolute font size (overrides fontsize_scale when set).
+# fontsize: absolute font size in points. Final rendered size regardless of scale_factor.
 ```
 
 ### Text
