@@ -237,6 +237,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_force(sketch, ..., name="")` | Add force to sketch | |
 | `make_force_pull(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Pulling force anchored at structure contact point | Arrowhead points away (e.g. downward) |
 | `add_force_pull(sketch, ..., name="")` | Add pulling force to sketch | |
+| `make_force_normal(cx, cy, scale_factor, inward=False, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Force perpendicular to image plane (circle with dot or cross) | `inward=False`: dot (out of plane); `inward=True`: cross (into plane) |
+| `add_force_normal(sketch, ..., name="")` | Add normal force to sketch | |
 | `make_moment(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Curved moment arrow | Counterclockwise |
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
 | `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
@@ -498,6 +500,14 @@ add_force(sketch, cx=5*S, cy=0, angle_deg=0, scale_factor=S,
 add_force(sketch, cx=5*S, cy=0, angle_deg=0, scale_factor=S,
           annotation=r"$F$", tip_at_surface=True)
 
+# Force perpendicular to image plane (out of plane = dot)
+add_force_normal(sketch, cx=5*S, cy=0, scale_factor=S,
+                 inward=False, annotation=r"$F_z$")
+
+# Force perpendicular to image plane (into plane = cross)
+add_force_normal(sketch, cx=6*S, cy=0, scale_factor=S,
+                 inward=True, annotation=r"$F_z$")
+
 # Pulling force (tension) anchored at the beam
 # (cx, cy) is where the force attaches to the structure
 # Arrowhead points AWAY from structure in the pull direction
@@ -740,6 +750,7 @@ COMPONENT_FACTORIES = {
     "beam": make_beam,
     "truss": make_truss,
     "force": make_force,
+    "force_normal": make_force_normal,
     "force_pull": make_force_pull,
     "moment": make_moment,
     "moment_arrow": make_moment_arrow,

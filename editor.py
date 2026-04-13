@@ -191,6 +191,7 @@ COMPONENT_FACTORIES = {
     "truss": ms_elements.make_truss,
     "arrow": ms_elements.make_arrow,
     "force": ms_elements.make_force,
+    "force_normal": ms_elements.make_force_normal,
     "moment": ms_elements.make_moment,
     "coordinate_system": ms_elements.make_coordinate_system,
     "dimension_arrow": ms_elements.make_dimension_arrow,
@@ -227,6 +228,7 @@ COMPONENT_ADD_FUNCTIONS = {
     "truss": "add_truss",
     "arrow": "add_arrow",
     "force": "add_force",
+    "force_normal": "add_force_normal",
     "moment": "add_moment",
     "coordinate_system": "add_coordinate_system",
     "dimension_arrow": "add_dimension_arrow",
@@ -1553,6 +1555,7 @@ class MainWindow(QMainWindow):
             ("Fixed Support (Einspannung)", ms_elements.add_fixed_support),
             ("Hinge (Gelenk)", ms_elements.add_hinge),
             ("Force (Kraft)", ms_elements.add_force),
+            ("Force Normal (out of plane)", ms_elements.add_force_normal),
             ("Moment", ms_elements.add_moment),
             ("Dimension Arrow", ms_elements.add_dimension_arrow),
             ("Coord System", ms_elements.add_coordinate_system)
@@ -1727,6 +1730,7 @@ class MainWindow(QMainWindow):
                 add_truss = staticmethod(ms_elements.add_truss)
                 add_arrow = staticmethod(ms_elements.add_arrow)
                 add_force = staticmethod(ms_elements.add_force)
+                add_force_normal = staticmethod(ms_elements.add_force_normal)
                 add_moment = staticmethod(ms_elements.add_moment)
                 add_coordinate_system = staticmethod(ms_elements.add_coordinate_system)
                 add_dimension_arrow = staticmethod(ms_elements.add_dimension_arrow)
@@ -1740,6 +1744,7 @@ class MainWindow(QMainWindow):
                 make_truss = staticmethod(ms_elements.make_truss)
                 make_arrow = staticmethod(ms_elements.make_arrow)
                 make_force = staticmethod(ms_elements.make_force)
+                make_force_normal = staticmethod(ms_elements.make_force_normal)
                 make_moment = staticmethod(ms_elements.make_moment)
                 make_coordinate_system = staticmethod(ms_elements.make_coordinate_system)
                 make_dimension_arrow = staticmethod(ms_elements.make_dimension_arrow)
@@ -1778,6 +1783,7 @@ class MainWindow(QMainWindow):
                 'add_truss': ms_elements.add_truss,
                 'add_arrow': ms_elements.add_arrow,
                 'add_force': ms_elements.add_force,
+                'add_force_normal': ms_elements.add_force_normal,
                 'add_moment': ms_elements.add_moment,
                 'add_coordinate_system': ms_elements.add_coordinate_system,
                 'add_dimension_arrow': ms_elements.add_dimension_arrow,

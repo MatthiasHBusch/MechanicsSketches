@@ -426,6 +426,61 @@ def add_force_pull(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name
     add_to_sketch(sketch, group)
     return group
 
+def make_force_normal(cx=0.0, cy=0.0, scale_factor=1.0, inward=False, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    """Creates a force arrow pointing into or out of the image plane.
+
+    Rendered as a circle with either a centered dot (out of plane, default)
+    or a cross (into plane).  The circle diameter matches the width of a
+    standard force arrowhead.
+
+    Args:
+        cx, cy: Application point (center of the symbol).
+        scale_factor: Uniform scale.
+        inward: If False (default), arrow points OUT of plane (dot).
+                If True, arrow points INTO plane (cross).
+        annotation: Optional label text (LaTeX supported), placed to the
+                    right of the symbol.
+        fontsize_scale: Scale factor for the annotation font size.
+        offsetx, offsety: Extra offset for the annotation position.
+        rotate_annotation: Rotation for the annotation text in degrees.
+    """
+    arrow_head_width = 0.5  # matches make_force
+    radius = arrow_head_width / 2
+    base_lw = 0.05
+    primitives = []
+
+    primitives.append(make_circle(0, 0, radius, linewidth=base_lw, layer=8))
+    if inward:
+        c = radius / math.sqrt(2)
+        primitives.append(make_line(-c, -c, c, c, linewidth=base_lw, layer=8))
+        primitives.append(make_line(-c, c, c, -c, linewidth=base_lw, layer=8))
+    else:
+        primitives.append(make_circle(0, 0, radius * 0.4, linewidth=base_lw, layer=9, facecolor="black"))
+
+    primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
+    primitives = translate(primitives, cx, cy)
+
+    if annotation != "":
+        # Place label to the right of the symbol
+        text = make_text(radius * 1.8, 0, annotation, fontsize_scale, 10, ha="left", va="center")
+        text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
+        text = translate(text, cx + offsetx, cy + offsety)
+        text = rotate(text, text["x"], text["y"], rotate_annotation)
+        primitives.append(text)
+
+    return primitives
+
+def add_force_normal(sketch, cx=0.0, cy=0.0, scale_factor=1.0, inward=False, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_force_normal(cx=cx, cy=cy, scale_factor=scale_factor, inward=inward, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+    if name == "":
+        direction = "in" if inward else "out"
+        name = f"Normalkraft {direction} ({cx}, {cy}, {scale_factor})"
+    group = make_group(objects, name)
+    group["c_type"] = "force_normal"
+    group["c_params"] = {"cx": cx, "cy": cy, "scale_factor": scale_factor, "inward": inward, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    add_to_sketch(sketch, group)
+    return group
+
 def make_moment(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Creates a moment (curved arrow).
 
