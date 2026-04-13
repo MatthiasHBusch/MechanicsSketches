@@ -291,7 +291,9 @@ def make_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, anno
     primitives = rotate(primitives, 0, 0, angle_deg)
     primitives = translate(primitives, cx, cy)
     if annotation != "":
-        text = make_text(length + 2 * arrow_head_length, -arrow_head_width, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        # fontsize is absolute (final size after scaling), fontsize_scale is relative
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(length + 2 * arrow_head_length, -arrow_head_width, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -341,7 +343,8 @@ def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", f
     primitives = translate(primitives, cx, cy)
 
     if annotation != "":
-        text = make_text(0, dy_c + arrow_length + 0.7, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0, dy_c + arrow_length + 0.7, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -407,7 +410,8 @@ def make_force_pull(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation=
         # structure.  In local coords the tip sits at y = dy_c, the label
         # should sit a bit beyond that (negative y in pull frame).
         label_h = total_h + 0.25          # slightly past the arrowhead
-        text = make_text(0, -label_h, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0, -label_h, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -462,7 +466,8 @@ def make_force_normal(cx=0.0, cy=0.0, scale_factor=1.0, inward=False, annotation
 
     if annotation != "":
         # Place label to the right of the symbol
-        text = make_text(radius * 1.8, 0, annotation, fontsize if fontsize is not None else fontsize_scale, 10, ha="left", va="center")
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(radius * 1.8, 0, annotation, fs, 10, ha="left", va="center")
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = translate(text, cx + offsetx, cy + offsety)
         text = rotate(text, text["x"], text["y"], rotate_annotation)
@@ -509,7 +514,8 @@ def make_moment(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", 
     primitives = translate(primitives, cx, cy)
     
     if annotation != "":
-        text = make_text(0.5, radius + 0.5, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0.5, radius + 0.5, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -578,7 +584,8 @@ def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotatio
     primitives = translate(primitives, cx, cy)
 
     if annotation != "":
-        text = make_text(0, 2 * dy_c + arrow_length, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0, 2 * dy_c + arrow_length, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -717,7 +724,8 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     if annotation != "":
         # Place label above the highest point of the connecting line
         max_y = max(line_points_y)
-        text = make_text(0, max_y + dy_c, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0, max_y + dy_c, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -1005,7 +1013,8 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
         else:
             # Place label closer when no distribution line is drawn
             text_y = dy_c + 0.8
-        text = make_text(0, text_y, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0, text_y, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -1053,11 +1062,16 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
     arrow_length = 3.0
     # linewidth
     base_lw = 0.05
-    fs = fontsize if fontsize is not None else fontsize_scale
+    # fontsize is absolute (final size after all scaling), so divide by scale_factor
+    # since the whole coordinate system is scaled at the end
+    fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+    # For make_arrow calls, pass pre-divided fontsize since arrows use scale_factor=1.0
+    # and the whole coordinate system is scaled by scale_factor afterwards
+    arrow_fontsize = fontsize / scale_factor if fontsize is not None else None
 
     primitives = []
-    primitives.extend(make_arrow(0, 0, arrow_length, 0, annotation=ax1, offsetx=offset_ax1_x, offsety=offset_ax1_y, fontsize_scale=fontsize_scale, fontsize=fontsize, rotate_annotation=rotate_annotation))
-    primitives.extend(make_arrow(0, 0, arrow_length, 90, annotation=ax2, offsetx=offset_ax2_x, offsety=offset_ax2_y, fontsize_scale=fontsize_scale, fontsize=fontsize, rotate_annotation=rotate_annotation))
+    primitives.extend(make_arrow(0, 0, arrow_length, 0, annotation=ax1, offsetx=offset_ax1_x, offsety=offset_ax1_y, fontsize_scale=fontsize_scale, fontsize=arrow_fontsize, rotate_annotation=rotate_annotation))
+    primitives.extend(make_arrow(0, 0, arrow_length, 90, annotation=ax2, offsetx=offset_ax2_x, offsety=offset_ax2_y, fontsize_scale=fontsize_scale, fontsize=arrow_fontsize, rotate_annotation=rotate_annotation))
     if ax3 != "":
         primitives.append(make_circle(0, 0, 0.2, linewidth=base_lw, layer=5))  # z-Axis
         if not last_axis_out_of_image:
@@ -1070,7 +1084,7 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
     # Adapt ax3 label distance from origin to fontsize — prevents overlap at larger scales
     ax3_base = 0.5 * max(1.0, fontsize_scale)
     primitives.append(make_text(ax3_base + offset_ax3_x, ax3_base + offset_ax3_y, ax3, fs, 10, rotation=rotate_annotation))
-        
+
     primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
     primitives = rotate(primitives, 0, 0, angle_deg, ignore_text=True)
     primitives = translate(primitives, cx, cy)
@@ -1136,7 +1150,8 @@ def make_dimension_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor
     primitives = translate(primitives, cx, cy)
     
     if annotation != "":
-        text = make_text(0, 2 * dy_c, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0, 2 * dy_c, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -1194,7 +1209,8 @@ def make_dimension_thickness(cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale
     primitives = translate(primitives, cx, cy)
     
     if annotation != "":
-        text = make_text(arrow_length/2 + 0.5, 0, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(arrow_length/2 + 0.5, 0, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
