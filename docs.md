@@ -231,35 +231,41 @@ Pre-built mechanical components for engineering diagrams.
 
 | Function | Description | Orientation (angle_deg=0) |
 |----------|-------------|---------------------------|
-| `make_arrow(cx, cy, length, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Generic arrow | Points rightward (+x) |
+| `make_arrow(cx, cy, length, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Generic arrow | Points rightward (+x) |
 | `add_arrow(sketch, ..., name="")` | Add arrow to sketch | |
-| `make_force(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation, tip_at_surface)` | Force arrow pointing toward the application point | Points downward (toward beam) |
+| `make_force(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation, tip_at_surface)` | Force arrow pointing toward the application point | Points downward (toward beam) |
 | `add_force(sketch, ..., name="")` | Add force to sketch | |
-| `make_force_pull(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Pulling force anchored at structure contact point | Arrowhead points away (e.g. downward) |
+| `make_force_pull(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Pulling force anchored at structure contact point | Arrowhead points away (e.g. downward) |
 | `add_force_pull(sketch, ..., name="")` | Add pulling force to sketch | |
-| `make_force_normal(cx, cy, scale_factor, inward=False, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Force perpendicular to image plane (circle with dot or cross) | `inward=False`: dot (out of plane); `inward=True`: cross (into plane) |
+| `make_force_normal(cx, cy, scale_factor, inward=False, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Force perpendicular to image plane (circle with dot or cross) | `inward=False`: dot (out of plane); `inward=True`: cross (into plane) |
 | `add_force_normal(sketch, ..., name="")` | Add normal force to sketch | |
-| `make_moment(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Curved moment arrow | Counterclockwise |
+| `make_moment(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Curved moment arrow | Counterclockwise |
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
-| `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
+| `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
 | `add_moment_arrow(sketch, ..., name="")` | Add moment arrow to sketch | |
-| `make_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ..., show_distribution_line, tip_at_surface)` | Distributed load (multiple arrows + connecting line) | Downward, uniform |
+| `make_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, fontsize_scale, fontsize, ..., show_distribution_line, tip_at_surface)` | Distributed load (multiple arrows + connecting line) | Downward, uniform |
 | `add_distributed_load(sketch, ..., name="")` | Add distributed load to sketch | |
-| `make_shear_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, ..., show_distribution_line, tip_at_surface)` | Shear distributed load (arrows parallel to surface) | Rightward, uniform |
+| `make_shear_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, fontsize_scale, fontsize, ..., show_distribution_line, tip_at_surface)` | Shear distributed load (arrows parallel to surface) | Rightward, uniform |
 | `add_shear_distributed_load(sketch, ..., name="")` | Add shear distributed load to sketch | |
+
+**Annotation Parameters** (common to all functions with annotations):
+- `fontsize_scale` – Relative font size multiplier (default: 1.0). Scaled with `scale_factor`.
+- `fontsize` – Absolute font size override (default: None). When set, bypasses `fontsize_scale`.
+- `offsetx`, `offsety` – Position offset for the annotation label.
+- `rotate_annotation` – Rotation angle for the annotation text in degrees.
 
 #### Dimensions & Coordinate Systems
 
 | Function | Description | Orientation (angle_deg=0) |
 |----------|-------------|---------------------------|
-| `make_coordinate_system(cx, cy, angle_deg, scale_factor, ax1, ax2, ax3, last_axis_out_of_image, fontsize_scale, rotate_annotation)` | x-y-z coordinate system | ax1→right, ax2→up |
+| `make_coordinate_system(cx, cy, angle_deg, scale_factor, ax1, ax2, ax3, last_axis_out_of_image, fontsize_scale, fontsize, rotate_annotation)` | x-y-z coordinate system | ax1→right, ax2→up |
 | `add_coordinate_system(sketch, ..., name="")` | Add coordinate system to sketch | |
-| `make_dimension_arrow(cx, cy, length, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Double-headed dimension arrow | Horizontal |
+| `make_dimension_arrow(cx, cy, length, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Double-headed dimension arrow | Horizontal |
 | `add_dimension_arrow(sketch, ..., name="")` | Add dimension to sketch | |
-| `make_dimension_thickness(cx, cy, thickness, angle_deg, scale_factor, annotation, fontsize_scale, offsetx, offsety, rotate_annotation)` | Thickness dimension (inward arrows) | Horizontal |
+| `make_dimension_thickness(cx, cy, thickness, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Thickness dimension (inward arrows) | Horizontal |
 | `add_dimension_thickness(sketch, ..., name="")` | Add thickness dimension to sketch | |
-| `add_dimension_arrow_pp(sketch, ax, ay, bx, by, ...)` | Dimension arrow between two points (computes center, length, angle) | A→B direction |
-| `add_dimension_thickness_pp(sketch, ax, ay, bx, by, ...)` | Thickness dimension between two points (computes center, distance, angle) | A→B direction |
+| `add_dimension_arrow_pp(sketch, ax, ay, bx, by, scale_factor, annotation, fontsize_scale, fontsize, ...)` | Dimension arrow between two points (computes center, length, angle) | A→B direction |
+| `add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor, annotation, fontsize_scale, fontsize, ...)` | Thickness dimension between two points (computes center, distance, angle) | A→B direction |
 
 #### Text
 

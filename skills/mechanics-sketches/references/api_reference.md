@@ -102,26 +102,27 @@ add_truss(sketch, ax, ay, bx, by, scale_factor=1.0, name="")
 
 ```python
 add_force(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
-          annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
+          annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
           rotate_annotation=False, tip_at_surface=False, name="")
 # Force arrow. angle_deg=0 → points downward (toward beam).
 # tip_at_surface=True: arrow tip exactly at (cx, cy), no gap.
 # tip_at_surface=False (default): small gap between tip and (cx, cy).
+# fontsize: absolute font size (overrides fontsize_scale when set).
 
 add_moment(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
-           annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
+           annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
            rotate_annotation=False, name="")
 # Curved moment arrow. angle_deg=0 → counterclockwise.
 
 add_moment_arrow(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
-                 annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
+                 annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
                  rotate_annotation=False, name="")
 # Straight moment arrow with double arrowhead (>>). angle_deg=0 → downward (same as force).
 # Two stacked arrowheads at the tip distinguish it from a single-headed force arrow.
 
 add_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
                      distribution=lambda t: 0.5, annotation="",
-                     fontsize_scale=1.0, offsetx=0, offsety=0,
+                     fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
                      rotate_annotation=False, show_distribution_line=True,
                      tip_at_surface=False, name="")
 # Distributed load (multiple arrows + connecting line). n_arrows auto-computed.
@@ -132,7 +133,7 @@ add_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
 
 add_shear_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
                            distribution=lambda t: 0.5, annotation="",
-                           fontsize_scale=1.0, offsetx=0, offsety=0,
+                           fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
                            rotate_annotation=False, show_distribution_line=True,
                            tip_at_surface=False, name="")
 # Shear distributed load (arrows parallel to surface, tangential).
@@ -147,15 +148,26 @@ add_shear_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0
 
 ```python
 add_dimension_arrow(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
-                    annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
+                    annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
                     rotate_annotation=False, name="")
 # Double-headed dimension arrow centered at (cx, cy).
 # length is in coordinate space (not scaled). angle_deg=0 → horizontal.
+# fontsize: absolute font size (overrides fontsize_scale when set).
 
 add_dimension_thickness(sketch, cx, cy, thickness, angle_deg=0, scale_factor=1.0,
-                        annotation="", fontsize_scale=1.0, offsetx=0, offsety=0,
+                        annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
                         rotate_annotation=False, name="")
 # Thickness dimension with inward-pointing arrows. angle_deg=0 → horizontal.
+
+add_dimension_arrow_pp(sketch, ax, ay, bx, by, scale_factor=1.0,
+                       annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
+                       rotate_annotation=False, name="")
+# Convenience wrapper: dimension arrow from point A to point B.
+
+add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor=1.0,
+                           annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
+                           rotate_annotation=False, name="")
+# Convenience wrapper: thickness dimension from point A to point B.
 ```
 
 ### Coordinate Systems
@@ -164,9 +176,10 @@ add_dimension_thickness(sketch, cx, cy, thickness, angle_deg=0, scale_factor=1.0
 add_coordinate_system(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
                       ax1="$x$", ax2="$y$", ax3="$z$",
                       last_axis_out_of_image=True,
-                      fontsize_scale=1.0, rotate_annotation=False, name="")
+                      fontsize_scale=1.0, fontsize=None, rotate_annotation=False, name="")
 # angle_deg=0 → ax1 points right, ax2 points up.
 # last_axis_out_of_image=True → dot (⊙), False → cross (⊗).
+# fontsize: absolute font size (overrides fontsize_scale when set).
 ```
 
 ### Text

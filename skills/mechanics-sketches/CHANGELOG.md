@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.0] - 2026-04-13
+
+### Added
+- `fontsize` parameter to all functions with `fontsize_scale` for absolute font size override
+- `force_normal` element for forces perpendicular to the image plane (dot/cross symbols)
+
+### Changed
+- When `fontsize` is set (not None), it overrides `fontsize_scale` for absolute sizing
+
 ## [1.1.0] - 2026-04-08
 
 ### Added
