@@ -266,7 +266,7 @@ def add_truss(sketch, ax, ay, bx, by, scale_factor=1.0, name=""):
 
 # --- Forces & Moments ---------------------------------------------------------
 
-def make_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1.0, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def make_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Creates a generic arrow.
 
     At angle_deg=0, the arrow points to the right (+x).
@@ -291,7 +291,7 @@ def make_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, anno
     primitives = rotate(primitives, 0, 0, angle_deg)
     primitives = translate(primitives, cx, cy)
     if annotation != "":
-        text = make_text(length + 2 * arrow_head_length, -arrow_head_width, annotation, fontsize_scale, 10)
+        text = make_text(length + 2 * arrow_head_length, -arrow_head_width, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -301,17 +301,17 @@ def make_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, anno
 
     return primitives
 
-def add_arrow(sketch, cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    objects = make_arrow(cx=cx, cy=cy, length=length, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+def add_arrow(sketch, cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_arrow(cx=cx, cy=cy, length=length, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
     if name == "":
         name = f"Pfeil ({cx}, {cy}, {length}, {angle_deg}°)"
     group = make_group(objects, name)
     group["c_type"] = "arrow"
-    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
     add_to_sketch(sketch, group)
     return group
 
-def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, tip_at_surface=False):
+def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0, tip_at_surface=False):
     """Creates a force arrow pointing toward the application point.
 
     At angle_deg=0, the force points downward (arrow tip near the beam,
@@ -341,7 +341,7 @@ def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", f
     primitives = translate(primitives, cx, cy)
 
     if annotation != "":
-        text = make_text(0, 2 * dy_c + arrow_length, annotation, fontsize_scale, 10)
+        text = make_text(0, dy_c + arrow_length + 0.7, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -350,17 +350,17 @@ def make_force(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", f
 
     return primitives
 
-def add_force(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, tip_at_surface=False):
-    objects = make_force(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, tip_at_surface=tip_at_surface)
+def add_force(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0, tip_at_surface=False):
+    objects = make_force(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, tip_at_surface=tip_at_surface)
     if name == "":
         name = f"Kraft ({cx}, {cy}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "force"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "tip_at_surface": tip_at_surface}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "tip_at_surface": tip_at_surface}
     add_to_sketch(sketch, group)
     return group
 
-def make_force_pull(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def make_force_pull(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Creates a pulling force arrow anchored at the structural contact point.
 
     Unlike make_force (where cx/cy is near the arrowhead), here cx/cy is
@@ -407,7 +407,7 @@ def make_force_pull(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation=
         # structure.  In local coords the tip sits at y = dy_c, the label
         # should sit a bit beyond that (negative y in pull frame).
         label_h = total_h + 0.25          # slightly past the arrowhead
-        text = make_text(0, -label_h, annotation, fontsize_scale, 10)
+        text = make_text(0, -label_h, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -416,17 +416,17 @@ def make_force_pull(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation=
 
     return primitives
 
-def add_force_pull(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    objects = make_force_pull(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+def add_force_pull(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_force_pull(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
     if name == "":
         name = f"Zugkraft ({cx}, {cy}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "force_pull"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
     add_to_sketch(sketch, group)
     return group
 
-def make_force_normal(cx=0.0, cy=0.0, scale_factor=1.0, inward=False, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def make_force_normal(cx=0.0, cy=0.0, scale_factor=1.0, inward=False, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Creates a force arrow pointing into or out of the image plane.
 
     Rendered as a circle with either a centered dot (out of plane, default)
@@ -462,7 +462,7 @@ def make_force_normal(cx=0.0, cy=0.0, scale_factor=1.0, inward=False, annotation
 
     if annotation != "":
         # Place label to the right of the symbol
-        text = make_text(radius * 1.8, 0, annotation, fontsize_scale, 10, ha="left", va="center")
+        text = make_text(radius * 1.8, 0, annotation, fontsize if fontsize is not None else fontsize_scale, 10, ha="left", va="center")
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = translate(text, cx + offsetx, cy + offsety)
         text = rotate(text, text["x"], text["y"], rotate_annotation)
@@ -470,18 +470,18 @@ def make_force_normal(cx=0.0, cy=0.0, scale_factor=1.0, inward=False, annotation
 
     return primitives
 
-def add_force_normal(sketch, cx=0.0, cy=0.0, scale_factor=1.0, inward=False, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    objects = make_force_normal(cx=cx, cy=cy, scale_factor=scale_factor, inward=inward, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+def add_force_normal(sketch, cx=0.0, cy=0.0, scale_factor=1.0, inward=False, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_force_normal(cx=cx, cy=cy, scale_factor=scale_factor, inward=inward, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
     if name == "":
         direction = "in" if inward else "out"
         name = f"Normalkraft {direction} ({cx}, {cy}, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "force_normal"
-    group["c_params"] = {"cx": cx, "cy": cy, "scale_factor": scale_factor, "inward": inward, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "scale_factor": scale_factor, "inward": inward, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
     add_to_sketch(sketch, group)
     return group
 
-def make_moment(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def make_moment(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Creates a moment (curved arrow).
 
     At angle_deg=0, the moment is counterclockwise.
@@ -509,7 +509,7 @@ def make_moment(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", 
     primitives = translate(primitives, cx, cy)
     
     if annotation != "":
-        text = make_text(0.5, radius + 0.5, annotation, fontsize_scale, 10)
+        text = make_text(0.5, radius + 0.5, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -518,17 +518,17 @@ def make_moment(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", 
 
     return primitives
 
-def add_moment(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    objects = make_moment(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+def add_moment(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_moment(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
     if name == "":
         name = f"Moment ({cx}, {cy}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "moment"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
     add_to_sketch(sketch, group)
     return group
 
-def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Creates a moment arrow (straight arrow with double arrowhead).
 
     A straight arrow with two arrowheads stacked at the tip (>>),
@@ -578,7 +578,7 @@ def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotatio
     primitives = translate(primitives, cx, cy)
 
     if annotation != "":
-        text = make_text(0, 2 * dy_c + arrow_length, annotation, fontsize_scale, 10)
+        text = make_text(0, 2 * dy_c + arrow_length, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -587,13 +587,13 @@ def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotatio
 
     return primitives
 
-def add_moment_arrow(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    objects = make_moment_arrow(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+def add_moment_arrow(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_moment_arrow(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
     if name == "":
         name = f"Momentenpfeil ({cx}, {cy}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "moment_arrow"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
     add_to_sketch(sketch, group)
     return group
 
@@ -601,7 +601,7 @@ def _default_distribution(t):
     return 0.5
 
 def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
-                           distribution=None, annotation="", fontsize_scale=1,
+                           distribution=None, annotation="", fontsize_scale=1, fontsize=None,
                            offsetx=0.0, offsety=0.0, rotate_annotation=0,
                            show_distribution_line=True, tip_at_surface=False):
     """Creates a distributed load (multiple arrows with connecting line).
@@ -717,7 +717,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     if annotation != "":
         # Place label above the highest point of the connecting line
         max_y = max(line_points_y)
-        text = make_text(0, max_y + dy_c, annotation, fontsize_scale, 10)
+        text = make_text(0, max_y + dy_c, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -727,12 +727,12 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
     return primitives
 
 def add_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
-                          distribution=None, annotation="", fontsize_scale=1,
+                          distribution=None, annotation="", fontsize_scale=1, fontsize=None,
                           offsetx=0.0, offsety=0.0, rotate_annotation=0,
                           show_distribution_line=True, tip_at_surface=False, name=""):
     objects = make_distributed_load(cx=cx, cy=cy, length=length, angle_deg=angle_deg,
                                     scale_factor=scale_factor, distribution=distribution,
-                                    annotation=annotation, fontsize_scale=fontsize_scale,
+                                    annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize,
                                     offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation,
                                     show_distribution_line=show_distribution_line,
                                     tip_at_surface=tip_at_surface)
@@ -742,7 +742,7 @@ def add_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scal
     group["c_type"] = "distributed_load"
     group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg,
                          "scale_factor": scale_factor, "annotation": annotation,
-                         "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety,
+                         "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety,
                          "rotate_annotation": rotate_annotation, "show_distribution_line": show_distribution_line,
                          "tip_at_surface": tip_at_surface}
     add_to_sketch(sketch, group)
@@ -851,7 +851,7 @@ def _solve_shear_arrow_positions(span, n_arrows, distribution, gap):
 
 
 def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
-                                 distribution=None, annotation="", fontsize_scale=1,
+                                 distribution=None, annotation="", fontsize_scale=1, fontsize=None,
                                  offsetx=0.0, offsety=0.0, rotate_annotation=0,
                                  show_distribution_line=True, tip_at_surface=False):
     """Creates a shear distributed load (arrows parallel to surface).
@@ -1005,7 +1005,7 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
         else:
             # Place label closer when no distribution line is drawn
             text_y = dy_c + 0.8
-        text = make_text(0, text_y, annotation, fontsize_scale, 10)
+        text = make_text(0, text_y, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -1015,12 +1015,12 @@ def make_shear_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale
     return primitives
 
 def add_shear_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_factor=1.0,
-                                distribution=None, annotation="", fontsize_scale=1,
+                                distribution=None, annotation="", fontsize_scale=1, fontsize=None,
                                 offsetx=0.0, offsety=0.0, rotate_annotation=0,
                                 show_distribution_line=True, tip_at_surface=False, name=""):
     objects = make_shear_distributed_load(cx=cx, cy=cy, length=length, angle_deg=angle_deg,
                                           scale_factor=scale_factor, distribution=distribution,
-                                          annotation=annotation, fontsize_scale=fontsize_scale,
+                                          annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize,
                                           offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation,
                                           show_distribution_line=show_distribution_line,
                                           tip_at_surface=tip_at_surface)
@@ -1030,7 +1030,7 @@ def add_shear_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0
     group["c_type"] = "shear_distributed_load"
     group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg,
                          "scale_factor": scale_factor, "annotation": annotation,
-                         "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety,
+                         "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety,
                          "rotate_annotation": rotate_annotation, "show_distribution_line": show_distribution_line,
                          "tip_at_surface": tip_at_surface}
     add_to_sketch(sketch, group)
@@ -1038,7 +1038,7 @@ def add_shear_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0
 
 # --- Dimensions & Coordinate System -------------------------------------------
 
-def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1="$x$", ax2="$y$", ax3="$z$", last_axis_out_of_image=True, fontsize_scale=1, rotate_annotation=0, offset_ax1_x=0.0, offset_ax1_y=0.0, offset_ax2_x=0.0, offset_ax2_y=0.0, offset_ax3_x=0.0, offset_ax3_y=0.0):
+def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1="$x$", ax2="$y$", ax3="$z$", last_axis_out_of_image=True, fontsize_scale=1, fontsize=None, rotate_annotation=0, offset_ax1_x=0.0, offset_ax1_y=0.0, offset_ax2_x=0.0, offset_ax2_y=0.0, offset_ax3_x=0.0, offset_ax3_y=0.0):
     """Creates a coordinate system with two in-plane axes and an optional third axis.
 
     At angle_deg=0, ax1 points right (+x) and ax2 points up (+y).
@@ -1053,10 +1053,11 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
     arrow_length = 3.0
     # linewidth
     base_lw = 0.05
-    
+    fs = fontsize if fontsize is not None else fontsize_scale
+
     primitives = []
-    primitives.extend(make_arrow(0, 0, arrow_length, 0, annotation=ax1, offsetx=offset_ax1_x, offsety=offset_ax1_y, fontsize_scale=fontsize_scale, rotate_annotation=rotate_annotation))
-    primitives.extend(make_arrow(0, 0, arrow_length, 90, annotation=ax2, offsetx=offset_ax2_x, offsety=offset_ax2_y, fontsize_scale=fontsize_scale, rotate_annotation=rotate_annotation))
+    primitives.extend(make_arrow(0, 0, arrow_length, 0, annotation=ax1, offsetx=offset_ax1_x, offsety=offset_ax1_y, fontsize_scale=fontsize_scale, fontsize=fontsize, rotate_annotation=rotate_annotation))
+    primitives.extend(make_arrow(0, 0, arrow_length, 90, annotation=ax2, offsetx=offset_ax2_x, offsety=offset_ax2_y, fontsize_scale=fontsize_scale, fontsize=fontsize, rotate_annotation=rotate_annotation))
     if ax3 != "":
         primitives.append(make_circle(0, 0, 0.2, linewidth=base_lw, layer=5))  # z-Axis
         if not last_axis_out_of_image:
@@ -1065,10 +1066,10 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
             primitives.append(make_line(-c, c, c, -c, linewidth=base_lw))
         else:
             primitives.append(make_circle(0, 0, 0.08, linewidth=base_lw, layer=6, facecolor="black"))
-    
+
     # Adapt ax3 label distance from origin to fontsize — prevents overlap at larger scales
     ax3_base = 0.5 * max(1.0, fontsize_scale)
-    primitives.append(make_text(ax3_base + offset_ax3_x, ax3_base + offset_ax3_y, ax3, fontsize_scale, 10, rotation=rotate_annotation))
+    primitives.append(make_text(ax3_base + offset_ax3_x, ax3_base + offset_ax3_y, ax3, fs, 10, rotation=rotate_annotation))
         
     primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
     primitives = rotate(primitives, 0, 0, angle_deg, ignore_text=True)
@@ -1076,17 +1077,17 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
 
     return primitives
 
-def add_coordinate_system(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1="$x$", ax2="$y$", ax3="$z$", last_axis_out_of_image=True, fontsize_scale=1, name="", rotate_annotation=0, offset_ax1_x=0.0, offset_ax1_y=0.0, offset_ax2_x=0.0, offset_ax2_y=0.0, offset_ax3_x=0.0, offset_ax3_y=0.0):
-    objects = make_coordinate_system(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, ax1=ax1, ax2=ax2, ax3=ax3, last_axis_out_of_image=last_axis_out_of_image, fontsize_scale=fontsize_scale, rotate_annotation=rotate_annotation, offset_ax1_x=offset_ax1_x, offset_ax1_y=offset_ax1_y, offset_ax2_x=offset_ax2_x, offset_ax2_y=offset_ax2_y, offset_ax3_x=offset_ax3_x, offset_ax3_y=offset_ax3_y)
+def add_coordinate_system(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1="$x$", ax2="$y$", ax3="$z$", last_axis_out_of_image=True, fontsize_scale=1, fontsize=None, name="", rotate_annotation=0, offset_ax1_x=0.0, offset_ax1_y=0.0, offset_ax2_x=0.0, offset_ax2_y=0.0, offset_ax3_x=0.0, offset_ax3_y=0.0):
+    objects = make_coordinate_system(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, ax1=ax1, ax2=ax2, ax3=ax3, last_axis_out_of_image=last_axis_out_of_image, fontsize_scale=fontsize_scale, fontsize=fontsize, rotate_annotation=rotate_annotation, offset_ax1_x=offset_ax1_x, offset_ax1_y=offset_ax1_y, offset_ax2_x=offset_ax2_x, offset_ax2_y=offset_ax2_y, offset_ax3_x=offset_ax3_x, offset_ax3_y=offset_ax3_y)
     if name == "":
         name = f"Koordinatensystem ({cx}, {cy}, {angle_deg}°)"
     group = make_group(objects, name)
     group["c_type"] = "coordinate_system"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "ax1": ax1, "ax2": ax2, "ax3": ax3, "last_axis_out_of_image": last_axis_out_of_image, "fontsize_scale": fontsize_scale, "rotate_annotation": rotate_annotation, "offset_ax1_x": offset_ax1_x, "offset_ax1_y": offset_ax1_y, "offset_ax2_x": offset_ax2_x, "offset_ax2_y": offset_ax2_y, "offset_ax3_x": offset_ax3_x, "offset_ax3_y": offset_ax3_y}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "ax1": ax1, "ax2": ax2, "ax3": ax3, "last_axis_out_of_image": last_axis_out_of_image, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "rotate_annotation": rotate_annotation, "offset_ax1_x": offset_ax1_x, "offset_ax1_y": offset_ax1_y, "offset_ax2_x": offset_ax2_x, "offset_ax2_y": offset_ax2_y, "offset_ax3_x": offset_ax3_x, "offset_ax3_y": offset_ax3_y}
     add_to_sketch(sketch, group)
     return group
 
-def make_dimension_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
+def make_dimension_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
     """Creates a double-headed dimension arrow.
 
     Positioned by its center (cx, cy). At angle_deg=0, the dimension is
@@ -1135,7 +1136,7 @@ def make_dimension_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor
     primitives = translate(primitives, cx, cy)
     
     if annotation != "":
-        text = make_text(0, 2 * dy_c, annotation, fontsize_scale, 10)
+        text = make_text(0, 2 * dy_c, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -1144,17 +1145,17 @@ def make_dimension_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor
 
     return primitives
 
-def add_dimension_arrow(sketch, cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
-    objects = make_dimension_arrow(cx=cx, cy=cy, length=length, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, helper_line_1_length=helper_line_1_length, helper_line_2_length=helper_line_2_length)
+def add_dimension_arrow(sketch, cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
+    objects = make_dimension_arrow(cx=cx, cy=cy, length=length, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, helper_line_1_length=helper_line_1_length, helper_line_2_length=helper_line_2_length)
     if name == "":
         name = f"Bemaßungspfeil ({cx}, {cy}, {length}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "dimension_arrow"
-    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "helper_line_1_length": helper_line_1_length, "helper_line_2_length": helper_line_2_length}
+    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "helper_line_1_length": helper_line_1_length, "helper_line_2_length": helper_line_2_length}
     add_to_sketch(sketch, group)
     return group
 
-def make_dimension_thickness(cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def make_dimension_thickness(cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Creates a thickness dimension with inward-pointing arrows.
 
     Positioned by its center (cx, cy). At angle_deg=0, the dimension is
@@ -1193,7 +1194,7 @@ def make_dimension_thickness(cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale
     primitives = translate(primitives, cx, cy)
     
     if annotation != "":
-        text = make_text(arrow_length/2 + 0.5, 0, annotation, fontsize_scale, 10)
+        text = make_text(arrow_length/2 + 0.5, 0, annotation, fontsize if fontsize is not None else fontsize_scale, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -1202,17 +1203,17 @@ def make_dimension_thickness(cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale
 
     return primitives
 
-def add_dimension_thickness(sketch, cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    objects = make_dimension_thickness(cx=cx, cy=cy, thickness=thickness, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+def add_dimension_thickness(sketch, cx=0.0, cy=0.0, thickness=1.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_dimension_thickness(cx=cx, cy=cy, thickness=thickness, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
     if name == "":
         name = f"Bemaßungsdicke ({cx}, {cy}, {thickness}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "dimension_thickness"
-    group["c_params"] = {"cx": cx, "cy": cy, "thickness": thickness, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "thickness": thickness, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
     add_to_sketch(sketch, group)
     return group
 
-def add_dimension_arrow_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
+def add_dimension_arrow_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0, helper_line_1_length=0.0, helper_line_2_length=0.0):
     """Add a dimension arrow between two points A and B.
     
     Convenience wrapper around make_dimension_arrow that computes center,
@@ -1222,18 +1223,18 @@ def add_dimension_arrow_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name="", an
     cy = (ay + by) / 2
     length = math.sqrt((bx - ax) ** 2 + (by - ay) ** 2)
     angle_deg = math.degrees(math.atan2(by - ay, bx - ax))
-    objects = make_dimension_arrow(cx=cx, cy=cy, length=length, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, helper_line_1_length=helper_line_1_length, helper_line_2_length=helper_line_2_length)
+    objects = make_dimension_arrow(cx=cx, cy=cy, length=length, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, helper_line_1_length=helper_line_1_length, helper_line_2_length=helper_line_2_length)
     if name == "":
         name = f"Bemaßungspfeil PP ({ax}, {ay}) -> ({bx}, {by})"
     group = make_group(objects, name)
     group["c_type"] = "dimension_arrow"
-    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "helper_line_1_length": helper_line_1_length, "helper_line_2_length": helper_line_2_length}
+    group["c_params"] = {"cx": cx, "cy": cy, "length": length, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "helper_line_1_length": helper_line_1_length, "helper_line_2_length": helper_line_2_length}
     add_to_sketch(sketch, group)
     return group
 
-def add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name="", annotation="", fontsize_scale=1, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
     """Add a thickness dimension between two points A and B.
-    
+
     Convenience wrapper around make_dimension_thickness that computes center,
     thickness (distance), and angle from the two endpoints.
     """
@@ -1241,12 +1242,12 @@ def add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor=1.0, name=""
     cy = (ay + by) / 2
     thickness = math.sqrt((bx - ax) ** 2 + (by - ay) ** 2)
     angle_deg = math.degrees(math.atan2(by - ay, bx - ax))
-    objects = make_dimension_thickness(cx=cx, cy=cy, thickness=thickness, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+    objects = make_dimension_thickness(cx=cx, cy=cy, thickness=thickness, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
     if name == "":
         name = f"Bemaßungsdicke PP ({ax}, {ay}) -> ({bx}, {by})"
     group = make_group(objects, name)
     group["c_type"] = "dimension_thickness"
-    group["c_params"] = {"cx": cx, "cy": cy, "thickness": thickness, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "thickness": thickness, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
     add_to_sketch(sketch, group)
     return group
 

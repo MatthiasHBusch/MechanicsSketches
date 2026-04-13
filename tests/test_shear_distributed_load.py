@@ -93,7 +93,7 @@ def test_shear_distributed_load_rotations(renderer='mpl'):
 
 
 if __name__ == "__main__":
-    renderer = 'qt' if '--qt' in sys.argv else 'mpl'
+    renderer = 'qt' if '--qt' in sys.argv else 'qt'
     print(f"Using renderer: {renderer}")
     print(f"Output directory: {OUTPUT_DIR}\n")
 
