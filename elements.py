@@ -593,7 +593,7 @@ def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotatio
 
     if annotation != "":
         fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
-        text = make_text(0, 2 * dy_c + arrow_length, annotation, fs, 10)
+        text = make_text(0, 0.7 + dy_c + arrow_length, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -733,7 +733,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
         # Place label above the highest point of the connecting line
         max_y = max(line_points_y)
         fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
-        text = make_text(0, max_y + dy_c + 0.5, annotation, fs, 10)
+        text = make_text(0, max_y + dy_c + 0.7, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -1254,7 +1254,7 @@ def make_dimension_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor
     
     if annotation != "":
         fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
-        text = make_text(0, 2 * dy_c, annotation, fs, 10)
+        text = make_text(0, 2 * dy_c + 0.2, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
