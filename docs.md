@@ -247,7 +247,7 @@ Pre-built mechanical components for engineering diagrams.
 | `add_distributed_load(sketch, ..., name="")` | Add distributed load to sketch | |
 | `make_shear_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, fontsize_scale, fontsize, ..., show_distribution_line, tip_at_surface)` | Shear distributed load (arrows parallel to surface) | Rightward, uniform |
 | `add_shear_distributed_load(sketch, ..., name="")` | Add shear distributed load to sketch | |
-| `make_pressure(cx, cy, scale_factor, n=8, annotation, fontsize_scale, fontsize, ..., angle_deg, inward=True)` | Pressure symbol (n radial arrows around a central label) | Arrows point inward by default |
+| `make_pressure(cx, cy, scale_factor, n=8, annotation, fontsize_scale, fontsize, ..., angle_deg, inward=False)` | Pressure symbol (n radial arrows around a central label) | Arrows point outward by default (positive pressure) |
 | `add_pressure(sketch, ..., name="")` | Add pressure symbol to sketch | |
 
 **Annotation Parameters** (common to all functions with annotations):

@@ -21,7 +21,7 @@ def test_pressure_variants():
     S = 30
     spacing = 200
 
-    # Row 1: different n values (inward)
+    # Row 1: different n values (default = outward, positive pressure)
     for i, n in enumerate([4, 6, 8, 12, 16]):
         cx = i * spacing
         cy = 0
@@ -30,13 +30,13 @@ def test_pressure_variants():
         add_to_sketch(sketch, make_text(cx, cy - 100, f"n={n}",
                                         fontsize=20, ha="center", va="top"))
 
-    # Row 2: outward arrows
+    # Row 2: inward arrows
     for i, n in enumerate([4, 6, 8, 12, 16]):
         cx = i * spacing
         cy = -spacing * 1.6
         add_pressure(sketch, cx=cx, cy=cy, scale_factor=S, n=n,
-                     annotation=r"$p$", fontsize=20, inward=False)
-        add_to_sketch(sketch, make_text(cx, cy - 100, f"n={n}, outward",
+                     annotation=r"$p$", fontsize=20, inward=True)
+        add_to_sketch(sketch, make_text(cx, cy - 100, f"n={n}, inward",
                                         fontsize=20, ha="center", va="top"))
 
     # Row 3: different annotations and rotations

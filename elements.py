@@ -1051,12 +1051,13 @@ def add_shear_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0
     return group
 
 def make_pressure(cx=0.0, cy=0.0, scale_factor=1.0, n=8, annotation="", fontsize_scale=1, fontsize=None,
-                  offsetx=0.0, offsety=0.0, rotate_annotation=0, angle_deg=0.0, inward=True):
+                  offsetx=0.0, offsety=0.0, rotate_annotation=0, angle_deg=0.0, inward=False):
     """Creates a pressure symbol (n arrows in a circle around a central annotation).
 
     A central label surrounded by n arrows arranged radially. By default the
-    arrows point inward (toward the center, indicating external pressure).
-    Set `inward=False` for arrows pointing outward (e.g. internal pressure).
+    arrows point outward (positive pressure convention).
+    Set `inward=True` for arrows pointing toward the center (e.g. negative
+    pressure or external compression).
 
     Args:
         cx, cy: Center of the pressure symbol.
@@ -1068,8 +1069,8 @@ def make_pressure(cx=0.0, cy=0.0, scale_factor=1.0, n=8, annotation="", fontsize
         offsetx, offsety: Extra offset for the annotation position.
         rotate_annotation: Rotation for the annotation text in degrees.
         angle_deg: Rotation of the entire arrow ring in degrees.
-        inward: If True (default), arrows point toward the center.
-                If False, arrows point outward from the center.
+        inward: If False (default), arrows point outward (positive pressure).
+                If True, arrows point toward the center.
     """
     arrow_length = 1.5
     arrow_head_length = 0.5
@@ -1128,7 +1129,7 @@ def make_pressure(cx=0.0, cy=0.0, scale_factor=1.0, n=8, annotation="", fontsize
     return primitives
 
 def add_pressure(sketch, cx=0.0, cy=0.0, scale_factor=1.0, n=8, annotation="", fontsize_scale=1, fontsize=None,
-                 offsetx=0.0, offsety=0.0, rotate_annotation=0, angle_deg=0.0, inward=True, name=""):
+                 offsetx=0.0, offsety=0.0, rotate_annotation=0, angle_deg=0.0, inward=False, name=""):
     objects = make_pressure(cx=cx, cy=cy, scale_factor=scale_factor, n=n, annotation=annotation,
                             fontsize_scale=fontsize_scale, fontsize=fontsize,
                             offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation,

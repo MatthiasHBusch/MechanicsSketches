@@ -147,11 +147,11 @@ add_shear_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0
 
 add_pressure(sketch, cx, cy, scale_factor=1.0, n=8, annotation="",
              fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
-             rotate_annotation=False, angle_deg=0, inward=True, name="")
+             rotate_annotation=False, angle_deg=0, inward=False, name="")
 # Pressure symbol: n radial arrows around a central annotation.
 # n: number of arrows arranged in a circle (default 8).
-# inward=True (default): arrows point toward the center (external pressure).
-# inward=False: arrows point outward from the center (internal pressure).
+# inward=False (default): arrows point outward from the center (positive pressure convention).
+# inward=True: arrows point toward the center (negative pressure / external compression).
 # angle_deg: rotates the entire arrow ring.
 ```
 
