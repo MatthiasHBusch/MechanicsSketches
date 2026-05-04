@@ -130,7 +130,7 @@ def add_roller_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, 
 
 # --- Einspannung ----------------------------------------------------------------
 
-def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, length=1.0):
+def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, length=1.0, abs_length=None):
     """Creates a fixed support / clamped wall (Einspannung).
 
     At angle_deg=0, this is a vertical wall with hatching to the left.
@@ -141,9 +141,14 @@ def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, length=1
         angle_deg: Rotation in degrees. 0 = vertical wall, hatching left.
         scale_factor: Uniform scale.
         length: Length of the support wall as a multiplier (default 1.0).
+        abs_length: Absolute length of the wall in scene units (final rendered
+                    size, independent of scale_factor). When set, overrides `length`.
     """
     # 0. Geometry constants
-    baseline_width = 2.5 * length
+    if abs_length is not None:
+        baseline_width = abs_length / scale_factor
+    else:
+        baseline_width = 2.5 * length
     # hatching
     hatching_distance = 0.6
     hatching_length = 0.6
@@ -166,13 +171,13 @@ def make_fixed_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, length=1
 
     return primitives
 
-def add_fixed_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, length=1.0, name=""):
-    objects = make_fixed_support(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, length=length)
+def add_fixed_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, length=1.0, abs_length=None, name=""):
+    objects = make_fixed_support(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, length=length, abs_length=abs_length)
     if name == "":
         name = f"Einspannung ({cx}, {cy}, {angle_deg}°)"
     group = make_group(objects, name)
     group["c_type"] = "fixed_support"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "length": length}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "length": length, "abs_length": abs_length}
     add_to_sketch(sketch, group)
     return group
 
@@ -725,7 +730,7 @@ def make_distributed_load(cx=0.0, cy=0.0, length=5.0, angle_deg=0.0, scale_facto
         # Place label above the highest point of the connecting line
         max_y = max(line_points_y)
         fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
-        text = make_text(0, max_y + dy_c, annotation, fs, 10)
+        text = make_text(0, max_y + dy_c + 0.5, annotation, fs, 10)
         text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
         text = rotate(text, 0, 0, angle_deg)
         text = translate(text, cx + offsetx, cy + offsety)
@@ -1042,6 +1047,100 @@ def add_shear_distributed_load(sketch, cx=0.0, cy=0.0, length=5.0, angle_deg=0.0
                          "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety,
                          "rotate_annotation": rotate_annotation, "show_distribution_line": show_distribution_line,
                          "tip_at_surface": tip_at_surface}
+    add_to_sketch(sketch, group)
+    return group
+
+def make_pressure(cx=0.0, cy=0.0, scale_factor=1.0, n=8, annotation="", fontsize_scale=1, fontsize=None,
+                  offsetx=0.0, offsety=0.0, rotate_annotation=0, angle_deg=0.0, inward=True):
+    """Creates a pressure symbol (n arrows in a circle around a central annotation).
+
+    A central label surrounded by n arrows arranged radially. By default the
+    arrows point inward (toward the center, indicating external pressure).
+    Set `inward=False` for arrows pointing outward (e.g. internal pressure).
+
+    Args:
+        cx, cy: Center of the pressure symbol.
+        scale_factor: Uniform scale.
+        n: Number of arrows arranged around the center (default 8).
+        annotation: Label text (LaTeX supported), placed at the center.
+        fontsize_scale: Relative font size multiplier (default 1.0).
+        fontsize: Absolute font size in points (overrides fontsize_scale when set).
+        offsetx, offsety: Extra offset for the annotation position.
+        rotate_annotation: Rotation for the annotation text in degrees.
+        angle_deg: Rotation of the entire arrow ring in degrees.
+        inward: If True (default), arrows point toward the center.
+                If False, arrows point outward from the center.
+    """
+    arrow_length = 1.5
+    arrow_head_length = 0.5
+    arrow_head_width = 0.35
+    inner_radius = 0.9   # gap between center and arrow tip (inward) / tail (outward)
+    base_lw = 0.05
+    primitives = []
+
+    for i in range(n):
+        angle = 360.0 * i / n
+        theta = math.radians(angle)
+        cos_t = math.cos(theta)
+        sin_t = math.sin(theta)
+        # Perpendicular direction for arrowhead width
+        perp_x = -sin_t
+        perp_y = cos_t
+
+        if inward:
+            # Tip at inner_radius, pointing toward center
+            tip_x = inner_radius * cos_t
+            tip_y = inner_radius * sin_t
+            tail_x = (inner_radius + arrow_length) * cos_t
+            tail_y = (inner_radius + arrow_length) * sin_t
+            head_base_x = tip_x + arrow_head_length * cos_t
+            head_base_y = tip_y + arrow_head_length * sin_t
+        else:
+            # Tail at inner_radius, tip outside
+            tail_x = inner_radius * cos_t
+            tail_y = inner_radius * sin_t
+            tip_x = (inner_radius + arrow_length) * cos_t
+            tip_y = (inner_radius + arrow_length) * sin_t
+            head_base_x = tip_x - arrow_head_length * cos_t
+            head_base_y = tip_y - arrow_head_length * sin_t
+
+        # Shaft
+        primitives.append(make_line(head_base_x, head_base_y, tail_x, tail_y, base_lw, 8))
+        # Arrowhead triangle
+        primitives.append(make_polygon([
+            [tip_x, tip_y],
+            [head_base_x + perp_x * arrow_head_width / 2, head_base_y + perp_y * arrow_head_width / 2],
+            [head_base_x - perp_x * arrow_head_width / 2, head_base_y - perp_y * arrow_head_width / 2]
+        ], base_lw, 8))
+
+    primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
+    primitives = rotate(primitives, 0, 0, angle_deg)
+    primitives = translate(primitives, cx, cy)
+
+    if annotation != "":
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0, 0, annotation, fs, 10)
+        text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
+        text = translate(text, cx + offsetx, cy + offsety)
+        text = rotate(text, text["x"], text["y"], rotate_annotation)
+        primitives.append(text)
+
+    return primitives
+
+def add_pressure(sketch, cx=0.0, cy=0.0, scale_factor=1.0, n=8, annotation="", fontsize_scale=1, fontsize=None,
+                 offsetx=0.0, offsety=0.0, rotate_annotation=0, angle_deg=0.0, inward=True, name=""):
+    objects = make_pressure(cx=cx, cy=cy, scale_factor=scale_factor, n=n, annotation=annotation,
+                            fontsize_scale=fontsize_scale, fontsize=fontsize,
+                            offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation,
+                            angle_deg=angle_deg, inward=inward)
+    if name == "":
+        name = f"Druck ({cx}, {cy}, n={n}, {scale_factor})"
+    group = make_group(objects, name)
+    group["c_type"] = "pressure"
+    group["c_params"] = {"cx": cx, "cy": cy, "scale_factor": scale_factor, "n": n,
+                         "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize,
+                         "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation,
+                         "angle_deg": angle_deg, "inward": inward}
     add_to_sketch(sketch, group)
     return group
 

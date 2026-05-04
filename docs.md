@@ -213,8 +213,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_pinned_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
 | `make_roller_support(cx, cy, angle_deg, scale_factor)` | Loslager | Roller support with sliding gap | Below beam, supporting upward |
 | `add_roller_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
-| `make_fixed_support(cx, cy, angle_deg, scale_factor, length=1.0)` | Einspannung | Fixed/clamped support with wall hatching | Vertical wall, hatching left |
-| `add_fixed_support(sketch, ..., length=1.0, name="")` | | Add to sketch with group wrapper | |
+| `make_fixed_support(cx, cy, angle_deg, scale_factor, length=1.0, abs_length=None)` | Einspannung | Fixed/clamped support with wall hatching. `abs_length` overrides `length` with an absolute scene-unit size (scale-independent). | Vertical wall, hatching left |
+| `add_fixed_support(sketch, ..., length=1.0, abs_length=None, name="")` | | Add to sketch with group wrapper | |
 | `make_hinge(cx, cy, scale_factor)` | Gelenk | Hinge joint (simple circle) | N/A (no angle param) |
 | `add_hinge(sketch, ..., name="")` | | Add to sketch with group wrapper | |
 
@@ -247,6 +247,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_distributed_load(sketch, ..., name="")` | Add distributed load to sketch | |
 | `make_shear_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, fontsize_scale, fontsize, ..., show_distribution_line, tip_at_surface)` | Shear distributed load (arrows parallel to surface) | Rightward, uniform |
 | `add_shear_distributed_load(sketch, ..., name="")` | Add shear distributed load to sketch | |
+| `make_pressure(cx, cy, scale_factor, n=8, annotation, fontsize_scale, fontsize, ..., angle_deg, inward=True)` | Pressure symbol (n radial arrows around a central label) | Arrows point inward by default |
+| `add_pressure(sketch, ..., name="")` | Add pressure symbol to sketch | |
 
 **Annotation Parameters** (common to all functions with annotations):
 - `fontsize_scale` – Relative font size multiplier (default: 1.0). Scaled with `scale_factor`.

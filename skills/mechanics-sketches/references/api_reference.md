@@ -81,8 +81,10 @@ add_pinned_support(sketch, cx, cy, angle_deg=0, scale_factor=1.0, name="")
 add_roller_support(sketch, cx, cy, angle_deg=0, scale_factor=1.0, name="")
 # Roller support (Loslager). angle_deg=0 → points upward with sliding gap.
 
-add_fixed_support(sketch, cx, cy, angle_deg=0, scale_factor=1.0, name="")
+add_fixed_support(sketch, cx, cy, angle_deg=0, scale_factor=1.0, length=1.0, abs_length=None, name="")
 # Fixed/clamped support (Einspannung). angle_deg=0 → vertical wall, hatching left.
+# length: relative size multiplier (default 1.0).
+# abs_length: absolute wall length in scene units (overrides length, scale-independent).
 
 add_hinge(sketch, cx, cy, scale_factor=1.0, name="")
 # Hinge joint (Gelenk). Simple circle, no angle parameter.
@@ -142,6 +144,15 @@ add_shear_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0
 # tip_at_surface=True: arrows exactly at the application line.
 # distribution: f(t) -> float, t ∈ [0,1]. Positive → rightward, negative → leftward.
 # Examples: lambda t: 0.5 (uniform), lambda t: t (triangular).
+
+add_pressure(sketch, cx, cy, scale_factor=1.0, n=8, annotation="",
+             fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
+             rotate_annotation=False, angle_deg=0, inward=True, name="")
+# Pressure symbol: n radial arrows around a central annotation.
+# n: number of arrows arranged in a circle (default 8).
+# inward=True (default): arrows point toward the center (external pressure).
+# inward=False: arrows point outward from the center (internal pressure).
+# angle_deg: rotates the entire arrow ring.
 ```
 
 ### Dimensions

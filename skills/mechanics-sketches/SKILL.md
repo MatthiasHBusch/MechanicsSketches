@@ -88,7 +88,7 @@ All components are designed so that `angle_deg=0` works for a **horizontal beam*
 | `add_truss(sketch, ax, ay, bx, by, scale_factor)` | Line member A→B | Endpoints, scale |
 | `add_pinned_support(sketch, cx, cy, angle_deg, scale_factor)` | Fixed-position support (triangle) | Center, angle, scale |
 | `add_roller_support(sketch, cx, cy, angle_deg, scale_factor)` | Sliding support | Center, angle, scale |
-| `add_fixed_support(sketch, cx, cy, angle_deg, scale_factor)` | Clamped wall support | Center, angle, scale |
+| `add_fixed_support(sketch, cx, cy, angle_deg, scale_factor, length, abs_length)` | Clamped wall support | Center, angle, scale, length (relative) or abs_length (scene units) |
 | `add_hinge(sketch, cx, cy, scale_factor)` | Joint circle | Center, scale |
 | `add_force(sketch, cx, cy, angle_deg, scale_factor, annotation, ..., tip_at_surface)` | Force arrow | Center, angle, scale, label, tip_at_surface |
 | `add_moment(sketch, cx, cy, angle_deg, scale_factor, annotation, ...)` | Curved moment arrow | Center, angle, scale, label |
@@ -98,6 +98,7 @@ All components are designed so that `angle_deg=0` works for a **horizontal beam*
 | `add_dimension_thickness_pp(sketch, ax, ay, bx, by, scale_factor, annotation, ...)` | Thickness dimension A→B (point-to-point) | Endpoints, scale, label |
 | `add_coordinate_system(sketch, cx, cy, angle_deg, scale_factor, ax1, ax2, ax3, ...)` | x-y-z axes | Center, angle, scale, axis labels |
 | `add_shear_distributed_load(sketch, cx, cy, length, angle_deg, scale_factor, distribution, annotation, ...)` | Shear load (arrows parallel to surface) | Center, length, angle, scale, distribution, label |
+| `add_pressure(sketch, cx, cy, scale_factor, n, annotation, ..., inward)` | Pressure symbol (n radial arrows around a central label) | Center, scale, number of arrows, label, inward (default True) |
 | `add_text(sketch, x, y, text, fontsize, name, rotation)` | Text annotation | Position, text, font size |
 
 ### Annotation Parameters
