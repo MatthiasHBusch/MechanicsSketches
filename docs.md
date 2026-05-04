@@ -241,7 +241,7 @@ Pre-built mechanical components for engineering diagrams.
 | `add_force_normal(sketch, ..., name="")` | Add normal force to sketch | |
 | `make_moment(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Curved moment arrow | Counterclockwise |
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
-| `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
+| `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation, tip_at_surface)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
 | `add_moment_arrow(sketch, ..., name="")` | Add moment arrow to sketch | |
 | `make_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, fontsize_scale, fontsize, ..., show_distribution_line, tip_at_surface)` | Distributed load (multiple arrows + connecting line) | Downward, uniform |
 | `add_distributed_load(sketch, ..., name="")` | Add distributed load to sketch | |

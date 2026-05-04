@@ -539,7 +539,7 @@ def add_moment(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="",
     add_to_sketch(sketch, group)
     return group
 
-def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
+def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0, tip_at_surface=False):
     """Creates a moment arrow (straight arrow with double arrowhead).
 
     A straight arrow with two arrowheads stacked at the tip (>>),
@@ -563,11 +563,14 @@ def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotatio
         fontsize_scale: Scale factor for the annotation font size.
         offsetx, offsety: Extra offset for the annotation position.
         rotate_annotation: Rotation for the annotation text in degrees.
+        tip_at_surface: If True, the arrow tip is exactly at (cx, cy).
+                    If False (default), there is a small gap between the
+                    tip and the application point (suitable for beams).
     """
     arrow_length = 3.0
     arrow_head_length = 0.7
     arrow_head_width = 0.5
-    dy_c = 0.5
+    dy_c = 0.1 if tip_at_surface else 0.5
     base_lw = 0.05
     primitives = []
 
@@ -599,13 +602,13 @@ def make_moment_arrow(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotatio
 
     return primitives
 
-def add_moment_arrow(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):
-    objects = make_moment_arrow(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation)
+def add_moment_arrow(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="", annotation="", fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0, tip_at_surface=False):
+    objects = make_moment_arrow(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor, annotation=annotation, fontsize_scale=fontsize_scale, fontsize=fontsize, offsetx=offsetx, offsety=offsety, rotate_annotation=rotate_annotation, tip_at_surface=tip_at_surface)
     if name == "":
         name = f"Momentenpfeil ({cx}, {cy}, {angle_deg}°, {scale_factor})"
     group = make_group(objects, name)
     group["c_type"] = "moment_arrow"
-    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation}
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor, "annotation": annotation, "fontsize_scale": fontsize_scale, "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety, "rotate_annotation": rotate_annotation, "tip_at_surface": tip_at_surface}
     add_to_sketch(sketch, group)
     return group
 

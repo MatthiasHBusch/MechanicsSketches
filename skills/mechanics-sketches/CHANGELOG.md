@@ -5,6 +5,7 @@
 ### Added
 - `pressure` element: n radial arrows around a central annotation (Drucksymbol)
 - `abs_length` parameter for `fixed_support`: absolute wall length in scene units, scale-independent
+- `tip_at_surface` parameter for `moment_arrow` (matches `force` convention)
 
 ## [1.2.0] - 2026-04-13
 
