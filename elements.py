@@ -269,6 +269,182 @@ def add_truss(sketch, ax, ay, bx, by, scale_factor=1.0, name=""):
     add_to_sketch(sketch, group)
     return group
 
+# --- Gears --------------------------------------------------------------------
+
+def _hatch_rectangle(x0, y0, x1, y1, spacing, lw, layer):
+    """Generate 45° diagonal hatching lines (slope -1) clipped to a rectangle."""
+    lines = []
+    # Line family: x + y = c. In the rectangle, c ∈ [x0+y0, x1+y1].
+    c_min = x0 + y0
+    c_max = x1 + y1
+    n_start = int(c_min / spacing) + 1
+    c = n_start * spacing
+    while c < c_max:
+        # Find intersections with rectangle edges.
+        pts = []
+        y_at_left = c - x0
+        if y0 <= y_at_left <= y1:
+            pts.append((x0, y_at_left))
+        y_at_right = c - x1
+        if y0 <= y_at_right <= y1:
+            pts.append((x1, y_at_right))
+        x_at_bottom = c - y0
+        if x0 < x_at_bottom < x1:
+            pts.append((x_at_bottom, y0))
+        x_at_top = c - y1
+        if x0 < x_at_top < x1:
+            pts.append((x_at_top, y1))
+        if len(pts) >= 2:
+            lines.append(make_line(pts[0][0], pts[0][1], pts[-1][0], pts[-1][1], lw, layer))
+        c += spacing
+    return lines
+
+def make_gear_cut(cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, b=30.0, tooth_fraction=0.15,
+                  angle_deg=0.0, scale_factor=1.0):
+    """Creates a cut gear (cross-section view, Schnittdarstellung).
+
+    Three rectangles representing the cross-section of a gear with shaft:
+    - Background rectangle: full radial extent including tooth tips, drawn
+      at a layer below the shaft so a beam/truss passing through is visible.
+    - Two foreground rectangles: gear body above and below the shaft, with
+      diagonal hatching at half line width.
+
+    At angle_deg=0, the gear axis is horizontal (along x), and the gear
+    extends vertically (in y) above and below the axis.
+
+    Args:
+        cx, cy: Center of the gear.
+        r_i: Inner radius (shaft bore), in scene units.
+        r_a: Reference (pitch) radius, in scene units. Teeth extend
+             symmetrically around r_a.
+        b: Width along the axis direction (at angle_deg=0), in scene units.
+        tooth_fraction: Tooth height as fraction of r_a (default 0.15).
+            Tooth tip radius = r_a * (1 + tooth_fraction/2).
+            Tooth root radius = r_a * (1 - tooth_fraction/2).
+        angle_deg: Rotation in degrees. 0 = axis along x.
+        scale_factor: Uniform scale (affects line widths and hatching density).
+    """
+    base_lw = 0.05
+    hatching_distance = 0.4
+
+    # Convert scene-unit lengths to local coords (will be scaled back at the end)
+    r_i = r_i / scale_factor
+    r_a = r_a / scale_factor
+    b = b / scale_factor
+
+    primitives = []
+
+    # 1. Background rectangle (full extent including tooth tips, behind shaft)
+    full_height = r_a * (1 + tooth_fraction / 2)
+    primitives.append(make_rectangle(-b/2, -full_height, b/2, full_height,
+                                     base_lw, layer=4))
+
+    # 2. Body rectangles (foreground, above and below shaft hole)
+    body_top = r_a * (1 - tooth_fraction / 2)
+
+    # Upper body
+    primitives.append(make_rectangle(-b/2, r_i, b/2, body_top,
+                                     base_lw, layer=6))
+    primitives.extend(_hatch_rectangle(-b/2, r_i, b/2, body_top,
+                                       hatching_distance, 0.5 * base_lw, 6))
+
+    # Lower body (mirrored)
+    primitives.append(make_rectangle(-b/2, -body_top, b/2, -r_i,
+                                     base_lw, layer=6))
+    primitives.extend(_hatch_rectangle(-b/2, -body_top, b/2, -r_i,
+                                       hatching_distance, 0.5 * base_lw, 6))
+
+    # Transforms
+    primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
+    primitives = rotate(primitives, 0, 0, angle_deg)
+    primitives = translate(primitives, cx, cy)
+
+    return primitives
+
+def add_gear_cut(sketch, cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, b=30.0, tooth_fraction=0.15,
+                 angle_deg=0.0, scale_factor=1.0, name=""):
+    objects = make_gear_cut(cx=cx, cy=cy, r_i=r_i, r_a=r_a, b=b,
+                             tooth_fraction=tooth_fraction,
+                             angle_deg=angle_deg, scale_factor=scale_factor)
+    if name == "":
+        name = f"Zahnrad geschnitten ({cx}, {cy}, r_i={r_i}, r_a={r_a}, b={b})"
+    group = make_group(objects, name)
+    group["c_type"] = "gear_cut"
+    group["c_params"] = {"cx": cx, "cy": cy, "r_i": r_i, "r_a": r_a, "b": b,
+                         "tooth_fraction": tooth_fraction,
+                         "angle_deg": angle_deg, "scale_factor": scale_factor}
+    add_to_sketch(sketch, group)
+    return group
+
+def make_gear_side(cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, n_teeth=12, tooth_fraction=0.15,
+                   angle_deg=0.0, scale_factor=1.0):
+    """Creates a side-view gear (looking along the rotation axis).
+
+    Drawn as an outer polygon for the tooth profile and an inner circle
+    for the shaft bore. Teeth alternate 50/50 with gaps (rectangular
+    profile with radial sides).
+
+    Args:
+        cx, cy: Center of the gear.
+        r_i: Inner radius (shaft bore), in scene units.
+        r_a: Reference (pitch) radius, in scene units.
+        n_teeth: Number of teeth around the gear.
+        tooth_fraction: Tooth height as fraction of r_a (default 0.15).
+        angle_deg: Rotation in degrees (rotates the entire gear).
+        scale_factor: Uniform scale (affects line widths).
+    """
+    base_lw = 0.05
+
+    # Convert scene-unit lengths to local coords
+    r_i = r_i / scale_factor
+    r_a = r_a / scale_factor
+
+    primitives = []
+
+    # Outer tooth polygon
+    r_root = r_a * (1 - tooth_fraction / 2)
+    r_tip = r_a * (1 + tooth_fraction / 2)
+    pitch = 2 * math.pi / n_teeth
+
+    points = []
+    for k in range(n_teeth):
+        # Tooth k spans angles [k - 0.25, k + 0.25] * pitch.
+        # Gap to tooth k+1 spans [k + 0.25, k + 0.75] * pitch.
+        ang_left = (k - 0.25) * pitch
+        ang_right = (k + 0.25) * pitch
+        points.append((r_root * math.cos(ang_left), r_root * math.sin(ang_left)))
+        points.append((r_tip * math.cos(ang_left), r_tip * math.sin(ang_left)))
+        points.append((r_tip * math.cos(ang_right), r_tip * math.sin(ang_right)))
+        points.append((r_root * math.cos(ang_right), r_root * math.sin(ang_right)))
+
+    primitives.append(make_polygon(points, base_lw, layer=6))
+
+    # Inner circle (shaft bore) — drawn above the polygon so its white fill
+    # creates the visual hole at the center.
+    primitives.append(make_circle(0, 0, r_i, base_lw, layer=7))
+
+    # Transforms
+    primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
+    primitives = rotate(primitives, 0, 0, angle_deg)
+    primitives = translate(primitives, cx, cy)
+
+    return primitives
+
+def add_gear_side(sketch, cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, n_teeth=12, tooth_fraction=0.15,
+                  angle_deg=0.0, scale_factor=1.0, name=""):
+    objects = make_gear_side(cx=cx, cy=cy, r_i=r_i, r_a=r_a, n_teeth=n_teeth,
+                              tooth_fraction=tooth_fraction,
+                              angle_deg=angle_deg, scale_factor=scale_factor)
+    if name == "":
+        name = f"Zahnrad seitlich ({cx}, {cy}, r_i={r_i}, r_a={r_a}, n={n_teeth})"
+    group = make_group(objects, name)
+    group["c_type"] = "gear_side"
+    group["c_params"] = {"cx": cx, "cy": cy, "r_i": r_i, "r_a": r_a, "n_teeth": n_teeth,
+                         "tooth_fraction": tooth_fraction,
+                         "angle_deg": angle_deg, "scale_factor": scale_factor}
+    add_to_sketch(sketch, group)
+    return group
+
 # --- Forces & Moments ---------------------------------------------------------
 
 def make_arrow(cx=0.0, cy=0.0, length=1.0, angle_deg=0.0, scale_factor=1.0, annotation="", fontsize_scale=1.0, fontsize=None, offsetx=0.0, offsety=0.0, rotate_annotation=0):

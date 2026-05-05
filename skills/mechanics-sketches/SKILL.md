@@ -86,6 +86,8 @@ All components are designed so that `angle_deg=0` works for a **horizontal beam*
 |----------|-------------|----------------|
 | `add_beam(sketch, ax, ay, bx, by, scale_factor)` | Rectangular beam A→B | Endpoints, scale |
 | `add_truss(sketch, ax, ay, bx, by, scale_factor)` | Line member A→B | Endpoints, scale |
+| `add_gear_cut(sketch, cx, cy, r_i, r_a, b, tooth_fraction, angle_deg, scale_factor)` | Cut gear (cross-section): background rect + two hatched body rects | Center, inner/pitch radii (scene units), width, tooth fraction |
+| `add_gear_side(sketch, cx, cy, r_i, r_a, n_teeth, tooth_fraction, angle_deg, scale_factor)` | Side-view gear: outer tooth polygon + inner bore | Center, radii (scene units), number of teeth, tooth fraction |
 | `add_pinned_support(sketch, cx, cy, angle_deg, scale_factor)` | Fixed-position support (triangle) | Center, angle, scale |
 | `add_roller_support(sketch, cx, cy, angle_deg, scale_factor)` | Sliding support | Center, angle, scale |
 | `add_fixed_support(sketch, cx, cy, angle_deg, scale_factor, length, abs_length)` | Clamped wall support | Center, angle, scale, length (relative) or abs_length (scene units) |

@@ -3,6 +3,8 @@
 ## [1.3.0] - 2026-05-04
 
 ### Added
+- `gear_cut` element: gear cross-section (3 rectangles, hatched body, background behind shaft)
+- `gear_side` element: gear side view (outer tooth polygon + inner bore circle)
 - `pressure` element: n radial arrows around a central annotation (Drucksymbol)
 - `abs_length` parameter for `fixed_support`: absolute wall length in scene units, scale-independent
 - `tip_at_surface` parameter for `moment_arrow` (matches `force` convention)

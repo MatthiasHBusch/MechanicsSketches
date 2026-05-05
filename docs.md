@@ -226,6 +226,10 @@ Pre-built mechanical components for engineering diagrams.
 | `add_beam(sketch, ...)` | | Add to sketch with group wrapper |
 | `make_truss(ax, ay, bx, by, scale_factor)` | Dehnstab | Truss member (line) between two points |
 | `add_truss(sketch, ...)` | | Add to sketch with group wrapper |
+| `make_gear_cut(cx, cy, r_i, r_a, b, tooth_fraction, angle_deg, scale_factor)` | Zahnrad (geschnitten) | Gear cross-section: background rectangle + two hatched body rectangles |
+| `add_gear_cut(sketch, ...)` | | Add to sketch with group wrapper |
+| `make_gear_side(cx, cy, r_i, r_a, n_teeth, tooth_fraction, angle_deg, scale_factor)` | Zahnrad (Seitenansicht) | Gear side view: outer tooth polygon + inner bore circle |
+| `add_gear_side(sketch, ...)` | | Add to sketch with group wrapper |
 
 #### Loads & Annotations
 
