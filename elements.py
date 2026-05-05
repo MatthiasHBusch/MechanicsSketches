@@ -277,7 +277,8 @@ def _hatch_rectangle(x0, y0, x1, y1, spacing, lw, layer):
     # Line family: x + y = c. In the rectangle, c ∈ [x0+y0, x1+y1].
     c_min = x0 + y0
     c_max = x1 + y1
-    n_start = int(c_min / spacing) + 1
+    # Use floor (not int truncation) so negative c_min doesn't skip a corner line.
+    n_start = int(math.floor(c_min / spacing)) + 1
     c = n_start * spacing
     while c < c_max:
         # Find intersections with rectangle edges.
@@ -408,14 +409,20 @@ def make_gear_side(cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, n_teeth=12, tooth_fractio
 
     points = []
     for k in range(n_teeth):
-        # Tooth k spans angles [k - 0.25, k + 0.25] * pitch.
-        # Gap to tooth k+1 spans [k + 0.25, k + 0.75] * pitch.
+        # Tooth k spans angles [k - 0.25, k + 0.25] * pitch (reference).
+        # Each of the 4 corners is shifted by ±dphi/4 to taper the tooth:
+        # wider at root, narrower at tip (more realistic gear profile).
         ang_left = (k - 0.25) * pitch
         ang_right = (k + 0.25) * pitch
-        points.append((r_root * math.cos(ang_left), r_root * math.sin(ang_left)))
-        points.append((r_tip * math.cos(ang_left), r_tip * math.sin(ang_left)))
-        points.append((r_tip * math.cos(ang_right), r_tip * math.sin(ang_right)))
-        points.append((r_root * math.cos(ang_right), r_root * math.sin(ang_right)))
+        dphi = ang_right - ang_left
+        phia = ang_left - dphi / 4    # root, left side (outer)
+        phib = ang_left + dphi / 4    # tip, left side (inner)
+        phic = ang_right - dphi / 4   # tip, right side (inner)
+        phid = ang_right + dphi / 4   # root, right side (outer)
+        points.append((r_root * math.cos(phia), r_root * math.sin(phia)))
+        points.append((r_tip * math.cos(phib), r_tip * math.sin(phib)))
+        points.append((r_tip * math.cos(phic), r_tip * math.sin(phic)))
+        points.append((r_root * math.cos(phid), r_root * math.sin(phid)))
 
     primitives.append(make_polygon(points, base_lw, layer=6))
 
