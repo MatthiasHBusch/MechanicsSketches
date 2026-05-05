@@ -377,7 +377,7 @@ def add_gear_cut(sketch, cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, b=30.0, tooth_fract
     add_to_sketch(sketch, group)
     return group
 
-def make_gear_side(cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, n_teeth=12, tooth_fraction=0.15,
+def make_gear_side(cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, n_teeth=24, tooth_fraction=0.15,
                    angle_deg=0.0, scale_factor=1.0):
     """Creates a side-view gear (looking along the rotation axis).
 
@@ -437,7 +437,7 @@ def make_gear_side(cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, n_teeth=12, tooth_fractio
 
     return primitives
 
-def add_gear_side(sketch, cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, n_teeth=12, tooth_fraction=0.15,
+def add_gear_side(sketch, cx=0.0, cy=0.0, r_i=12.0, r_a=45.0, n_teeth=24, tooth_fraction=0.15,
                   angle_deg=0.0, scale_factor=1.0, name=""):
     objects = make_gear_side(cx=cx, cy=cy, r_i=r_i, r_a=r_a, n_teeth=n_teeth,
                               tooth_fraction=tooth_fraction,

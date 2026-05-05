@@ -111,7 +111,7 @@ add_gear_cut(sketch, cx, cy, r_i=12.0, r_a=45.0, b=30.0, tooth_fraction=0.15,
 # r_i, r_a, b are in scene units. tooth_fraction sets tooth height / r_a.
 # At angle_deg=0, the gear axis is horizontal (along x).
 
-add_gear_side(sketch, cx, cy, r_i=12.0, r_a=45.0, n_teeth=12, tooth_fraction=0.15,
+add_gear_side(sketch, cx, cy, r_i=12.0, r_a=45.0, n_teeth=24, tooth_fraction=0.15,
               angle_deg=0, scale_factor=1.0, name="")
 # Side-view gear (looking along the rotation axis).
 # Outer polygon for the tooth profile (50/50 tooth/gap, rectangular teeth)
