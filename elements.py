@@ -1355,9 +1355,20 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
     # and the whole coordinate system is scaled by scale_factor afterwards
     arrow_fontsize = fontsize / scale_factor if fontsize is not None else None
 
-    primitives = []
-    primitives.extend(make_arrow(0, 0, arrow_length, 0, annotation=ax1, offsetx=offset_ax1_x, offsety=offset_ax1_y, fontsize_scale=fontsize_scale, fontsize=arrow_fontsize, rotate_annotation=rotate_annotation))
-    primitives.extend(make_arrow(0, 0, arrow_length, 90, annotation=ax2, offsetx=offset_ax2_x, offsety=offset_ax2_y, fontsize_scale=fontsize_scale, fontsize=arrow_fontsize, rotate_annotation=rotate_annotation))
+    # Build arrows WITHOUT label offsets — offsets are applied after the
+    # rotation by angle_deg so they always act in the unrotated scene frame.
+    arr1 = make_arrow(0, 0, arrow_length, 0, annotation=ax1,
+                      fontsize_scale=fontsize_scale, fontsize=arrow_fontsize,
+                      rotate_annotation=rotate_annotation)
+    arr2 = make_arrow(0, 0, arrow_length, 90, annotation=ax2,
+                      fontsize_scale=fontsize_scale, fontsize=arrow_fontsize,
+                      rotate_annotation=rotate_annotation)
+
+    # Separate label text (last element when annotation != "") from the rest.
+    text_ax1 = arr1.pop() if ax1 != "" else None
+    text_ax2 = arr2.pop() if ax2 != "" else None
+
+    primitives = arr1 + arr2
     if ax3 != "":
         primitives.append(make_circle(0, 0, 0.2, linewidth=base_lw, layer=5))  # z-Axis
         if not last_axis_out_of_image:
@@ -1367,13 +1378,28 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
         else:
             primitives.append(make_circle(0, 0, 0.08, linewidth=base_lw, layer=6, facecolor="black"))
 
-    # Adapt ax3 label distance from origin to fontsize — prevents overlap at larger scales
+    # ax3 label without offset (offset applied after rotation, like ax1/ax2)
     ax3_base = 0.5 * max(1.0, fontsize_scale)
-    primitives.append(make_text(ax3_base + offset_ax3_x, ax3_base + offset_ax3_y, ax3, fs, 10, rotation=rotate_annotation))
+    text_ax3 = (make_text(ax3_base, ax3_base, ax3, fs, 10, rotation=rotate_annotation)
+                if ax3 != "" else None)
 
+    # --- Transforms ---
+    # Non-text primitives: scale → rotate(angle_deg) → translate(cx, cy).
     primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
     primitives = rotate(primitives, 0, 0, angle_deg, ignore_text=True)
     primitives = translate(primitives, cx, cy)
+
+    # Each label: same scale + rotation, then translated to (cx + offset, cy + offset)
+    # so the offset acts in unrotated scene-coordinate directions.
+    for text, ox, oy in [(text_ax1, offset_ax1_x, offset_ax1_y),
+                          (text_ax2, offset_ax2_x, offset_ax2_y),
+                          (text_ax3, offset_ax3_x, offset_ax3_y)]:
+        if text is None:
+            continue
+        text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
+        text = rotate(text, 0, 0, angle_deg, ignore_text=True)
+        text = translate(text, cx + ox, cy + oy)
+        primitives.append(text)
 
     return primitives
 
