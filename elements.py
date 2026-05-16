@@ -1368,15 +1368,19 @@ def make_coordinate_system(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, ax1=
     text_ax1 = arr1.pop() if ax1 != "" else None
     text_ax2 = arr2.pop() if ax2 != "" else None
 
+    # Bump arrow primitives to layer 8+ so they render above the hinge (layer 7).
+    for p in arr1 + arr2:
+        p["l"] = 8
+
     primitives = arr1 + arr2
     if ax3 != "":
-        primitives.append(make_circle(0, 0, 0.2, linewidth=base_lw, layer=5))  # z-Axis
+        primitives.append(make_circle(0, 0, 0.2, linewidth=base_lw, layer=8))  # z-Axis
         if not last_axis_out_of_image:
             c=0.2/math.sqrt(2)
-            primitives.append(make_line(-c, -c, c, c, linewidth=base_lw))
-            primitives.append(make_line(-c, c, c, -c, linewidth=base_lw))
+            primitives.append(make_line(-c, -c, c, c, linewidth=base_lw, layer=8))
+            primitives.append(make_line(-c, c, c, -c, linewidth=base_lw, layer=8))
         else:
-            primitives.append(make_circle(0, 0, 0.08, linewidth=base_lw, layer=6, facecolor="black"))
+            primitives.append(make_circle(0, 0, 0.08, linewidth=base_lw, layer=9, facecolor="black"))
 
     # ax3 label without offset (offset applied after rotation, like ax1/ax2)
     ax3_base = 0.5 * max(1.0, fontsize_scale)
