@@ -1,13 +1,17 @@
 # Changelog
 
-## [1.3.0] - 2026-05-04
+## [1.3.0] - 2026-05-08
 
 ### Added
+- `moment_arrow_pull` element: pulling moment arrow (double arrowhead), anchored at structure (analog to `force_pull`)
 - `gear_cut` element: gear cross-section (3 rectangles, hatched body, background behind shaft)
 - `gear_side` element: gear side view (outer tooth polygon + inner bore circle)
 - `pressure` element: n radial arrows around a central annotation (Drucksymbol)
 - `abs_length` parameter for `fixed_support`: absolute wall length in scene units, scale-independent
 - `tip_at_surface` parameter for `moment_arrow` (matches `force` convention)
+
+### Fixed
+- `coordinate_system`: label offsets (`offset_axN_x/y`) now act in the unrotated scene frame instead of being rotated with the system
 
 ## [1.2.0] - 2026-04-13
 

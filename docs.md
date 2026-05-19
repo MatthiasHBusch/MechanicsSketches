@@ -247,6 +247,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_moment(sketch, ..., name="")` | Add moment to sketch | |
 | `make_moment_arrow(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation, tip_at_surface)` | Straight arrow with double arrowhead (>>) | Points downward (same as force) |
 | `add_moment_arrow(sketch, ..., name="")` | Add moment arrow to sketch | |
+| `make_moment_arrow_pull(cx, cy, angle_deg, scale_factor, annotation, fontsize_scale, fontsize, offsetx, offsety, rotate_annotation)` | Pulling moment arrow (double arrowhead) anchored at structure contact point | Double arrowhead points away (e.g. downward) |
+| `add_moment_arrow_pull(sketch, ..., name="")` | Add pulling moment arrow to sketch | |
 | `make_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, fontsize_scale, fontsize, ..., show_distribution_line, tip_at_surface)` | Distributed load (multiple arrows + connecting line) | Downward, uniform |
 | `add_distributed_load(sketch, ..., name="")` | Add distributed load to sketch | |
 | `make_shear_distributed_load(cx, cy, length, angle_deg, scale_factor, distribution, annotation, fontsize_scale, fontsize, ..., show_distribution_line, tip_at_surface)` | Shear distributed load (arrows parallel to surface) | Rightward, uniform |

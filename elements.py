@@ -795,6 +795,88 @@ def add_moment_arrow(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, na
     add_to_sketch(sketch, group)
     return group
 
+def make_moment_arrow_pull(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, annotation="",
+                           fontsize_scale=1, fontsize=None, offsetx=0.0, offsety=0.0,
+                           rotate_annotation=0):
+    """Creates a pulling moment arrow (double arrowhead) anchored at the structural contact point.
+
+    Unlike make_moment_arrow (where cx/cy is near the arrowheads), here cx/cy
+    is the point on the structure where the moment is applied (the far end
+    of the arrow shaft). The double arrowhead points AWAY from the structure
+    in the direction given by angle_deg.
+
+    Use this for "pulling" moment representations where it is natural to
+    specify the attachment point on the beam rather than the arrowhead.
+
+    At angle_deg=0, the moment pulls downward (same convention as
+    make_moment_arrow and make_force_pull).
+
+    Args:
+        cx, cy: Point on the structure where the moment is applied.
+        angle_deg: Direction of the pull. 0 = downward, 90 = rightward,
+                   180 = upward, -90/270 = leftward.
+        scale_factor: Uniform scale.
+        annotation: Label text (LaTeX supported), placed past the
+                    double arrowhead, away from the structure.
+        fontsize_scale: Relative font size multiplier.
+        fontsize: Absolute font size override (overrides fontsize_scale).
+        offsetx, offsety: Extra offset for the annotation position.
+        rotate_annotation: Rotation for the annotation text in degrees.
+    """
+    # Geometry constants (must match make_moment_arrow with tip_at_surface=False)
+    dy_c = 0.5
+    arrow_length = 3.0
+    total_h = dy_c + arrow_length  # 3.5
+
+    theta = math.radians(angle_deg)
+    sin_t = math.sin(theta)
+    cos_t = math.cos(theta)
+
+    # Shift internal origin so the far end of the shaft lands at (cx, cy).
+    # In make_moment_arrow local coords the far end is at (0, total_h) before scaling.
+    # After scale + rotate + translate to (cx_int, cy_int):
+    #   far_end = (cx_int - total_h*sf*sin(θ),  cy_int + total_h*sf*cos(θ))
+    # We want far_end == (cx, cy):
+    shift_x =  total_h * scale_factor * sin_t
+    shift_y = -total_h * scale_factor * cos_t
+    cx_int = cx + shift_x
+    cy_int = cy + shift_y
+
+    # Generate the moment_arrow without annotation (we reposition it ourselves)
+    primitives = make_moment_arrow(cx_int, cy_int, angle_deg, scale_factor)
+
+    if annotation != "":
+        # Place annotation past the front arrowhead tip (away from structure).
+        # Matches moment_arrow's 0.7 label spacing past the shaft.
+        label_h = arrow_length + 0.7
+        fs = fontsize / scale_factor if fontsize is not None else fontsize_scale
+        text = make_text(0, -label_h, annotation, fs, 10)
+        text = scale(text, 0, 0, scale_factor, scale_linewidth=True)
+        text = rotate(text, 0, 0, angle_deg)
+        text = translate(text, cx + offsetx, cy + offsety)
+        text = rotate(text, text["x"], text["y"], rotate_annotation - angle_deg)
+        primitives.append(text)
+
+    return primitives
+
+def add_moment_arrow_pull(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name="",
+                          annotation="", fontsize_scale=1, fontsize=None,
+                          offsetx=0.0, offsety=0.0, rotate_annotation=0):
+    objects = make_moment_arrow_pull(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor,
+                                     annotation=annotation, fontsize_scale=fontsize_scale,
+                                     fontsize=fontsize, offsetx=offsetx, offsety=offsety,
+                                     rotate_annotation=rotate_annotation)
+    if name == "":
+        name = f"Momentenpfeil Zug ({cx}, {cy}, {angle_deg}°, {scale_factor})"
+    group = make_group(objects, name)
+    group["c_type"] = "moment_arrow_pull"
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor,
+                         "annotation": annotation, "fontsize_scale": fontsize_scale,
+                         "fontsize": fontsize, "offsetx": offsetx, "offsety": offsety,
+                         "rotate_annotation": rotate_annotation}
+    add_to_sketch(sketch, group)
+    return group
+
 def _default_distribution(t):
     return 0.5
 

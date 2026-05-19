@@ -143,6 +143,14 @@ add_moment_arrow(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
 # tip_at_surface=True: arrow tip exactly at (cx, cy), no gap.
 # tip_at_surface=False (default): small gap between tip and (cx, cy).
 
+add_moment_arrow_pull(sketch, cx, cy, angle_deg=0, scale_factor=1.0,
+                      annotation="", fontsize_scale=1.0, fontsize=None,
+                      offsetx=0, offsety=0, rotate_annotation=False, name="")
+# Pulling moment arrow (double arrowhead) anchored at the structural contact point.
+# Unlike moment_arrow, (cx, cy) is the far end of the shaft (the structure side);
+# the double arrowhead points AWAY from the structure in direction angle_deg.
+# angle_deg=0 → pulls downward (same convention as force_pull).
+
 add_distributed_load(sketch, cx, cy, length, angle_deg=0, scale_factor=1.0,
                      distribution=lambda t: 0.5, annotation="",
                      fontsize_scale=1.0, fontsize=None, offsetx=0, offsety=0,
