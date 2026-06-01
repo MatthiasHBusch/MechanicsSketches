@@ -3,6 +3,7 @@
 ## [1.3.0] - 2026-05-08
 
 ### Added
+- `sleeve_support` element: sliding sleeve (Verschiebehülse) — moment-only support drawn as a π plus fixed wall behind it
 - `moment_arrow_pull` element: pulling moment arrow (double arrowhead), anchored at structure (analog to `force_pull`)
 - `gear_cut` element: gear cross-section (3 rectangles, hatched body, background behind shaft)
 - `gear_side` element: gear side view (outer tooth polygon + inner bore circle)

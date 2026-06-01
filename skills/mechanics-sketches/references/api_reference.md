@@ -88,6 +88,13 @@ add_fixed_support(sketch, cx, cy, angle_deg=0, scale_factor=1.0, length=1.0, abs
 
 add_hinge(sketch, cx, cy, scale_factor=1.0, name="")
 # Hinge joint (Gelenk). Simple circle, no angle parameter.
+
+add_sleeve_support(sketch, cx, cy, angle_deg=0, scale_factor=1.0, name="")
+# Sliding sleeve support (Verschiebehülse) — transmits only a moment,
+# allows translation in both directions. Rendered as a π-shape (vertical
+# crossbar on the left, two horizontal legs pointing right toward the
+# beam) plus a fixed wall behind it (parallel to the crossbar).
+# (cx, cy) is the beam end; at angle_deg=0 the beam extends to the right.
 ```
 
 ### Structural Elements

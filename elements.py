@@ -181,6 +181,77 @@ def add_fixed_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, l
     add_to_sketch(sketch, group)
     return group
 
+# --- Verschiebehülse / sliding sleeve support ---------------------------------
+
+def make_sleeve_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
+    """Creates a sliding sleeve support (Verschiebehülse).
+
+    A support that transmits only a moment — it resists rotation but
+    allows free translation in both directions (along the beam and
+    perpendicular to it). Rendered as a π-shape with three strokes plus
+    a fixed wall (Einspannung) parallel to the π's vertical stroke.
+
+    At angle_deg=0 the convention matches fixed_support: the support sits
+    on the LEFT side of (cx, cy) and the beam continues to the right.
+    The π is rotated 90° mathematically positive relative to its standard
+    letter orientation — the "crossbar" is vertical on the left, and the
+    two "legs" point right toward the beam. The fixed wall sits parallel
+    to the π crossbar, slightly further to the left, hatching pointing left.
+
+    The reference point (cx, cy) is the END of the beam.
+
+    Args:
+        cx, cy: Beam end (reference point).
+        angle_deg: Rotation in degrees. 0 = beam comes in from the right
+                   (support on the left), matching fixed_support's convention.
+        scale_factor: Uniform scale.
+    """
+    base_lw = 0.05
+    # Geometry constants (local / unscaled coords; scaled at the end).
+    delta = 0.6                                       # offset of π vertical stroke from beam end
+    beam_half_thickness = 0.4                          # matches make_beam (0.4 * scale_factor)
+    y_horizontal = beam_half_thickness + delta / 3     # horizontal strokes ~delta/3 outside the beam
+    horizontal_stroke_x_end = delta / 2                # legs extend a bit past the beam end (+delta/2)
+    fixed_wall_extra_offset = 0.4                      # additional offset of fixed wall behind π
+
+    x_vertical_stroke = -delta
+    x_wall = x_vertical_stroke - fixed_wall_extra_offset
+    wall_height = 2 * y_horizontal                     # matches π vertical-stroke length
+
+    primitives = []
+
+    # π vertical "crossbar" (left side)
+    primitives.append(make_line(x_vertical_stroke, -y_horizontal,
+                                 x_vertical_stroke,  y_horizontal, base_lw, 5))
+    # π top "leg" (horizontal, pointing right toward the beam)
+    primitives.append(make_line(x_vertical_stroke,  y_horizontal,
+                                 horizontal_stroke_x_end,  y_horizontal, base_lw, 5))
+    # π bottom "leg"
+    primitives.append(make_line(x_vertical_stroke, -y_horizontal,
+                                 horizontal_stroke_x_end, -y_horizontal, base_lw, 5))
+
+    # Fixed wall parallel to the π crossbar, slightly further to the left.
+    # Called with scale_factor=1.0 so it gets scaled together with the rest at the end.
+    primitives.extend(make_fixed_support(
+        cx=x_wall, cy=0.0, angle_deg=0.0, scale_factor=1.0, abs_length=wall_height
+    ))
+
+    primitives = scale(primitives, 0, 0, scale_factor, scale_linewidth=True)
+    primitives = rotate(primitives, 0, 0, angle_deg)
+    primitives = translate(primitives, cx, cy)
+
+    return primitives
+
+def add_sleeve_support(sketch, cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0, name=""):
+    objects = make_sleeve_support(cx=cx, cy=cy, angle_deg=angle_deg, scale_factor=scale_factor)
+    if name == "":
+        name = f"Verschiebehülse ({cx}, {cy}, {angle_deg}°)"
+    group = make_group(objects, name)
+    group["c_type"] = "sleeve_support"
+    group["c_params"] = {"cx": cx, "cy": cy, "angle_deg": angle_deg, "scale_factor": scale_factor}
+    add_to_sketch(sketch, group)
+    return group
+
 # --- Gelenk ----------------------------------------------------------------
 
 def make_hinge(cx=0.0, cy=0.0, scale_factor=1.0):

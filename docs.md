@@ -215,6 +215,8 @@ Pre-built mechanical components for engineering diagrams.
 | `add_roller_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
 | `make_fixed_support(cx, cy, angle_deg, scale_factor, length=1.0, abs_length=None)` | Einspannung | Fixed/clamped support with wall hatching. `abs_length` overrides `length` with an absolute scene-unit size (scale-independent). | Vertical wall, hatching left |
 | `add_fixed_support(sketch, ..., length=1.0, abs_length=None, name="")` | | Add to sketch with group wrapper | |
+| `make_sleeve_support(cx, cy, angle_deg, scale_factor)` | Verschiebehülse | Moment-only support (π-shape + fixed wall behind). Resists rotation, allows translation in both directions. | π with vertical crossbar left, legs pointing right; wall further left with hatching |
+| `add_sleeve_support(sketch, ..., name="")` | | Add to sketch with group wrapper | |
 | `make_hinge(cx, cy, scale_factor)` | Gelenk | Hinge joint (simple circle) | N/A (no angle param) |
 | `add_hinge(sketch, ..., name="")` | | Add to sketch with group wrapper | |
 

@@ -91,6 +91,7 @@ All components are designed so that `angle_deg=0` works for a **horizontal beam*
 | `add_pinned_support(sketch, cx, cy, angle_deg, scale_factor)` | Fixed-position support (triangle) | Center, angle, scale |
 | `add_roller_support(sketch, cx, cy, angle_deg, scale_factor)` | Sliding support | Center, angle, scale |
 | `add_fixed_support(sketch, cx, cy, angle_deg, scale_factor, length, abs_length)` | Clamped wall support | Center, angle, scale, length (relative) or abs_length (scene units) |
+| `add_sleeve_support(sketch, cx, cy, angle_deg, scale_factor)` | Sliding sleeve / Verschiebehülse: moment-only support (resists rotation, allows translation) | Beam end (cx, cy), angle, scale |
 | `add_hinge(sketch, cx, cy, scale_factor)` | Joint circle | Center, scale |
 | `add_force(sketch, cx, cy, angle_deg, scale_factor, annotation, ..., tip_at_surface)` | Force arrow | Center, angle, scale, label, tip_at_surface |
 | `add_moment(sketch, cx, cy, angle_deg, scale_factor, annotation, ...)` | Curved moment arrow | Center, angle, scale, label |
