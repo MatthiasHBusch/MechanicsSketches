@@ -208,12 +208,14 @@ def make_sleeve_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
     """
     base_lw = 0.05
     # Geometry constants (local / unscaled coords; scaled at the end).
+    # Gaps (beam↔legs and crossbar↔wall) match roller_support's baseline_gap (0.15).
+    gap = 0.15
     delta = 0.4                                        # offset of π vertical stroke from beam end
-    y_horizontal = 0.6                                 # horizontal strokes ±0.6 (0.2 outside beam edge ±0.4)
+    y_horizontal = 0.4 + gap                           # horizontal strokes ±0.55 (gap above/below beam edge ±0.4)
     horizontal_stroke_length = 0.99                    # total leg length
     horizontal_stroke_x_end = horizontal_stroke_length - delta  # legs extend past beam end by this amount
-    y_vertical_end = 1.2                               # vertical stroke extends 50% past y_horizontal at each end
-    fixed_wall_extra_offset = 0.4                      # additional offset of fixed wall behind π
+    y_vertical_end = 2 * y_horizontal                  # vertical stroke extends y_horizontal past each side
+    fixed_wall_extra_offset = gap                      # gap between vertical stroke and fixed wall
 
     x_vertical_stroke = -delta
     x_wall = x_vertical_stroke - fixed_wall_extra_offset
