@@ -214,12 +214,12 @@ def make_sleeve_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
     y_horizontal = 0.4 + gap                           # horizontal strokes ±0.55 (gap above/below beam edge ±0.4)
     horizontal_stroke_length = 0.99                    # total leg length
     horizontal_stroke_x_end = horizontal_stroke_length - delta  # legs extend past beam end by this amount
-    y_vertical_end = 2 * y_horizontal                  # vertical stroke extends y_horizontal past each side
+    y_vertical_end = 1.2                               # fixed: vertical stroke half-length (total length 2.4)
     fixed_wall_extra_offset = gap                      # gap between vertical stroke and fixed wall
 
     x_vertical_stroke = -delta
     x_wall = x_vertical_stroke - fixed_wall_extra_offset
-    wall_height = 2 * y_vertical_end                   # matches the (longer) π vertical-stroke length
+    wall_height = 2 * y_vertical_end                   # matches π vertical-stroke length (2.4)
 
     primitives = []
 
