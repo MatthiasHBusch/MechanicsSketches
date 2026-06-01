@@ -208,21 +208,22 @@ def make_sleeve_support(cx=0.0, cy=0.0, angle_deg=0.0, scale_factor=1.0):
     """
     base_lw = 0.05
     # Geometry constants (local / unscaled coords; scaled at the end).
-    delta = 0.6                                       # offset of π vertical stroke from beam end
-    beam_half_thickness = 0.4                          # matches make_beam (0.4 * scale_factor)
-    y_horizontal = beam_half_thickness + delta / 3     # horizontal strokes ~delta/3 outside the beam
-    horizontal_stroke_x_end = delta / 2                # legs extend a bit past the beam end (+delta/2)
+    delta = 0.4                                        # offset of π vertical stroke from beam end
+    y_horizontal = 0.6                                 # horizontal strokes ±0.6 (0.2 outside beam edge ±0.4)
+    horizontal_stroke_length = 0.99                    # total leg length
+    horizontal_stroke_x_end = horizontal_stroke_length - delta  # legs extend past beam end by this amount
+    y_vertical_end = 1.2                               # vertical stroke extends 50% past y_horizontal at each end
     fixed_wall_extra_offset = 0.4                      # additional offset of fixed wall behind π
 
     x_vertical_stroke = -delta
     x_wall = x_vertical_stroke - fixed_wall_extra_offset
-    wall_height = 2 * y_horizontal                     # matches π vertical-stroke length
+    wall_height = 2 * y_vertical_end                   # matches the (longer) π vertical-stroke length
 
     primitives = []
 
-    # π vertical "crossbar" (left side)
-    primitives.append(make_line(x_vertical_stroke, -y_horizontal,
-                                 x_vertical_stroke,  y_horizontal, base_lw, 5))
+    # π vertical "crossbar" (left side, overshoots top and bottom horizontals by 50%)
+    primitives.append(make_line(x_vertical_stroke, -y_vertical_end,
+                                 x_vertical_stroke,  y_vertical_end, base_lw, 5))
     # π top "leg" (horizontal, pointing right toward the beam)
     primitives.append(make_line(x_vertical_stroke,  y_horizontal,
                                  horizontal_stroke_x_end,  y_horizontal, base_lw, 5))
